@@ -1,3 +1,9 @@
-def test_flask_run(flask_client):
+from http import HTTPStatus
+
+
+def test_flask_run(make_get_request):
     """Тест проверки что flask запущен и отвечает на тестовый запрос"""
-    assert flask_client.get("/ping").data.decode() == "pong"
+    response = make_get_request("ping")
+
+    assert response.status == HTTPStatus.OK
+    assert response.body == "pong"

@@ -19,6 +19,9 @@ class User(db.Model, UUIDMixin, TimeStampedMixin):
     def __repr__(self):
         return f"<User {self.username}>"
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
     @property
     def password(self):
         """Делаем поле пароль недоступным для чтения"""
