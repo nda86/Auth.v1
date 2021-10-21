@@ -1,7 +1,7 @@
 POST http://localhost:5000/auth/sign-up
 Content-Type: application/json
 
-{"username":  "nda", "password": "12348", "email":  "lol@com.ru"}
+{"username":  "loshara2kkk", "password": "123455555555", "email":  "lol@cokm.ru"}
 
 ###
 GET http://localhost:5000/ping

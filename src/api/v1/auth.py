@@ -1,21 +1,18 @@
-from flask import Blueprint, request
-from flask_pydantic import validate
-from pydantic import BaseModel, Field, EmailStr
+from flask import Blueprint, request, current_app
 
+from .utils.decorators import validate_request
+from src.schemas.user_schema import SignUpSchema
+from src.services.user_service import UserService
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
-class ModelSignUP(BaseModel):
-    """Модель для валидации body при регистрации пользователя"""
-    username: str = Field(..., min_length=3, max_length=15)
-    password: str = Field(..., min_length=8, max_length=30)
-    first_name: str = Field("")
-    last_name: str = Field("")
-    email: EmailStr = Field(...)
-
-
 @auth_bp.route("/sign-up", methods=["POST"])
-@validate(body=ModelSignUP)
-def sign_up():
-    return request.json
+@validate_request(SignUpSchema)
+def sign_up(data, service: UserService):
+    """ data это словарь данных возвращаемым декоратором @validate_request.
+    Объект типа UserService попадает сюда с помощью DI, реализованной библиотекой flask_injector
+    Подробности: https://github.com/alecthomas/flask_injector
+    """
+    return service.create(data)
+

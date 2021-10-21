@@ -1,6 +1,5 @@
 from src import create_app, db
 from src.services.user_service import UserService
-from src.models.user_pydantic import user_pydantic
 from src.models.user import User
 
 app = create_app()
