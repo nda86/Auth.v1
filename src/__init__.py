@@ -1,8 +1,10 @@
+import json
 import typing as t
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from werkzeug.exceptions import HTTPException
 
 from src.core.config import settings
 
@@ -26,6 +28,21 @@ def create_app(test_config: t.Optional[dict] = None) -> Flask:
         """
         is_sqlite = db.engine.url.drivername == "sqlite"
     migrate.init_app(app, db, render_as_batch=is_sqlite, compare_type=True)
+
+    from .api.v1 import create_api
+    create_api(app)
+
+    @app.errorhandler(HTTPException)
+    def json_exc_handler(e: HTTPException):
+        """Отлавливает все HTTPException и отдает ответ об ошибке в формате json"""
+        resp = e.get_response()
+        resp.data = json.dumps({
+            "code": e.code,
+            "name": e.name,
+            "description": e.description
+        })
+        resp.content_type = "application/json"
+        return resp
 
     @app.route("/ping")
     def hello():

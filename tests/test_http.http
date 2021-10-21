@@ -1,4 +1,10 @@
-GET http://localhost:5000/hello
+POST http://localhost:5000/auth/sign-up
+Content-Type: application/json
+
+{"username":  "nda", "password": "12348", "email":  "lol@com.ru"}
+
+###
+GET http://localhost:5000/ping
 Accept: application/json
 
 ###

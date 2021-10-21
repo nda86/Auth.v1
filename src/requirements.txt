@@ -4,3 +4,5 @@ flask-sqlalchemy==2.5.1
 flask-migrate==3.1.0
 requests==2.26.0
 multidict==5.2.0
+pydantic-sqlalchemy==0.0.9
+flask-pydantic[email]==0.8.0
