@@ -20,6 +20,10 @@ def create_app(test_config: t.Optional[dict] = None) -> Flask:
 
     db.init_app(app)  # инициализация БД
     with app.app_context():
+        """Определяем движок бд. Если бд sqlite, то при инициализации инструмента миграций передаём флаг
+        render_as_batch=True
+        Подробности https://alembic.sqlalchemy.org/en/latest/batch.html
+        """
         is_sqlite = db.engine.url.drivername == "sqlite"
     migrate.init_app(app, db, render_as_batch=is_sqlite, compare_type=True)
 
