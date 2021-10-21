@@ -1,8 +1,13 @@
 import typing as t
 
-from flask import Flask, jsonify
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 from src.core.config import settings
+
+db = SQLAlchemy()
+migrate = Migrate()
 
 
 def create_app(test_config: t.Optional[dict] = None) -> Flask:
@@ -13,9 +18,14 @@ def create_app(test_config: t.Optional[dict] = None) -> Flask:
     else:
         app.config.from_mapping(test_config)
 
-    @app.route("/hello")
+    db.init_app(app)  # инициализация БД
+    with app.app_context():
+        is_sqlite = db.engine.url.drivername == "sqlite"
+    migrate.init_app(app, db, render_as_batch=is_sqlite, compare_type=True)
+
+    @app.route("/ping")
     def hello():
         """Роут для проверки запуска flask"""
-        return jsonify("Hello, World!")
+        return "pong"
 
     return app
