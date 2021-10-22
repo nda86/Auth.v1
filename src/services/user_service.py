@@ -11,7 +11,7 @@ class UserService:
     model = User
     schema = UserSchema
 
-    def create(self, data: dict):
+    def create_user(self, data: dict):
         """Создание пользователя в БД - регистрация"""
         self.schema().load(data)
         password = data.pop("password", None)

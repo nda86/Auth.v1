@@ -22,10 +22,10 @@ class HTTPResponse:
     status: int
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def flask_client() -> FlaskClient:
     """Клиент для тестирования сервиса на flask"""
-    app = create_app({"TESTING": True, "SQLALCHEMY_DATABASE_URI": "sqlite://"})
+    app = create_app(settings)
     with app.test_client() as client:
         with app.app_context():
             db.create_all()
@@ -36,6 +36,24 @@ def flask_client() -> FlaskClient:
 def http_client() -> requests:
     """Объект для выполнения HTTP запросов"""
     return requests
+
+
+@pytest.fixture
+def create_user(flask_client):
+    """Фикстура принимает словарь параметров и инициирует создание пользователя"""
+    def inner(user_data: dict):
+        rv = flask_client.post("/auth/sign-up", data=user_data)
+        return rv
+    return inner
+
+
+@pytest.fixture
+def login_user(flask_client):
+    """Фикстура принимает словарь параметров и инициирует создание пользователя"""
+    def inner(data: dict):
+        rv = flask_client.post("/auth/sign-in", data=data)
+        return rv
+    return inner
 
 
 @pytest.fixture

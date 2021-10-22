@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
 from flask_injector import FlaskInjector
+from flask_jwt_extended import JWTManager
 from werkzeug.exceptions import HTTPException
 
 from src.core.config import settings
@@ -13,15 +14,22 @@ from src.core.config import settings
 db = SQLAlchemy()
 migrate = Migrate()
 ma = Marshmallow()
+jwt = JWTManager()
 
 
-def create_app(test_config: t.Optional[dict] = None) -> Flask:
+def create_app(test_config: t.Optional[object] = None) -> Flask:
     app = Flask(__name__)
 
     if test_config is None:
         app.config.from_object(settings)
     else:
-        app.config.from_mapping(test_config)
+        app.config.from_object(test_config)
+
+    jwt.init_app(app)  # инициализация менеджера для работы с JWT
+
+    @jwt.user_identity_loader
+    def user_identity_loader(user) -> str:
+        return str(user.id)
 
     ma.init_app(app)  # инициализация Marshmallow
     db.init_app(app)  # инициализация БД
