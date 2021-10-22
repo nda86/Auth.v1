@@ -1,3 +1,6 @@
+POST http://localhost:5000/auth/refresh
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTYzNDkxMjYxNiwianRpIjoiMDNlOWZlN2ItYmIwOC00MmMxLWE1YTMtNGFhODNmMDdjMjZmIiwidHlwZSI6InJlZnJlc2giLCJzdWIiOiI2ZThmMzlkZi1jNTE4LTQ0MTMtOWVkYS1hYThjNGFkZGFiZDEiLCJuYmYiOjE2MzQ5MTI2MTYsImV4cCI6MTYzNzUwNDYxNn0.pyrXCYEKbKL8YAD3V-UyKFXnaKbhyVRZoqqBW4E0XLI
+###
 POST http://localhost:5000/auth/sign-in
 Content-Type: application/json
 

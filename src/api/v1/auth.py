@@ -1,7 +1,10 @@
 from flask import Blueprint
+from flask_jwt_extended import jwt_required
+
 
 from src.schemas.user_schema import SignUpSchema, SignInSchema
 from src.services import UserService, AuthService
+
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -20,3 +23,9 @@ def sign_up(data, user_service: UserService):
 @AuthService.validate_request(schema=SignInSchema)
 def sign_in(data, auth_service: AuthService):
     return auth_service.sign_in(data)
+
+
+@auth_bp.route("/refresh", methods=["POST"])
+@jwt_required(refresh=True)
+def refresh(auth_service: AuthService):
+    return auth_service.refresh_jwt()
