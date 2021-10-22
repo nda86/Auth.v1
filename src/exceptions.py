@@ -2,6 +2,8 @@ from werkzeug.exceptions import HTTPException
 
 
 class DBValidationException(HTTPException):
+    """EXC бросаем его если пользователь при регистрации ввёл
+    данные которые не проходят валидацию в бд"""
     code = 400
     name = "CONSTRANT: Already exists"
 
@@ -11,6 +13,8 @@ class DBValidationException(HTTPException):
 
 
 class ApiValidationException(HTTPException):
+    """EXC бросаем его если пользователь при регистрации ввёл
+    данные которые не проходят валидацию в API"""
     code = 400
     name = "API Validation error"
 
@@ -20,8 +24,20 @@ class ApiValidationException(HTTPException):
 
 
 class DBMaintainException(HTTPException):
+    """EXC бросаем его если в бд случилась непредвиденная ошибка.
+    Клиенту просто отдаём код 500 с общим описание что-то пошло не так"""
     code = 500
     name = "System error in database"
+
+    def __init__(self, description: str):
+        self.description = description
+        super().__init__()
+
+
+class WrongCredentials(HTTPException):
+    """EXC бросаем его если пользователь при аутентификации указал неверный логи или пароль"""
+    code = 400
+    name = "Wrong credentials"
 
     def __init__(self, description: str):
         self.description = description

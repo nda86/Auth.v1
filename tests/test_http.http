@@ -1,10 +1,20 @@
+POST http://localhost:5000/auth/sign-in
+Content-Type: application/json
+
+{
+  "username": "flask",
+  "password": "flask1111111111"
+}
+
+###
 POST http://localhost:5000/auth/sign-up
 Content-Type: application/json
 
-{"username":  "loshara2kkk", "password": "123455555555", "email":  "lol@cokm.ru"}
+{"username":  "flask", "password": "flask1111111111", "email":  "lol@cokm11111.ru"}
 
 ###
 GET http://localhost:5000/ping
 Accept: application/json
 
 ###
+
