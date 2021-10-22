@@ -15,4 +15,3 @@ def sign_up(data, service: UserService):
     Подробности: https://github.com/alecthomas/flask_injector
     """
     return service.create(data)
-

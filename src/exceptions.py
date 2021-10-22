@@ -2,7 +2,7 @@ from werkzeug.exceptions import HTTPException
 
 
 class DBValidationException(HTTPException):
-    code = 401
+    code = 400
     name = "CONSTRANT: Already exists"
 
     def __init__(self, description: str):

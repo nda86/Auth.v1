@@ -11,7 +11,7 @@ from requests.structures import CaseInsensitiveDict
 from .config import settings
 
 sys.path.append(str(Path(__file__).parent.parent))
-from src import create_app  # noqa
+from src import create_app, db  # noqa
 
 
 @dataclass
@@ -22,11 +22,13 @@ class HTTPResponse:
     status: int
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def flask_client() -> FlaskClient:
     """Клиент для тестирования сервиса на flask"""
-    app = create_app({"TESTING": True})
+    app = create_app({"TESTING": True, "SQLALCHEMY_DATABASE_URI": "sqlite://"})
     with app.test_client() as client:
+        with app.app_context():
+            db.create_all()
         yield client
 
 
