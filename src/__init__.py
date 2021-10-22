@@ -31,6 +31,10 @@ def create_app(test_config: t.Optional[object] = None) -> Flask:
     def user_identity_loader(user) -> str:
         return str(user.id)
 
+    @jwt.user_lookup_loader
+    def user_lookup_loader(jwt_header: dict, jwt_payload: dict):
+        return UserService().get_by_id(jwt_payload["sub"])
+
     ma.init_app(app)  # инициализация Marshmallow
     db.init_app(app)  # инициализация БД
     with app.app_context():

@@ -42,3 +42,13 @@ class WrongCredentials(HTTPException):
     def __init__(self, description: str):
         self.description = description
         super().__init__()
+
+
+class RefreshTokenInvalid(HTTPException):
+    """EXC бросаем его если refresh token отсутствует в БД, то есть считаем его недействительным"""
+    code = 401
+    name = "Refresh token is unavailable"
+
+    def __init__(self, description: str):
+        self.description = description
+        super().__init__()

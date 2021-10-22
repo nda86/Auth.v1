@@ -1,11 +1,11 @@
 import functools
+import typing as t
 
 from flask import request, Response, jsonify
 from marshmallow import ValidationError, EXCLUDE
 from injector import inject
 
-
-from src.exceptions import ApiValidationException, WrongCredentials
+from src.exceptions import ApiValidationException, WrongCredentials, RefreshTokenInvalid
 from .user_service import UserService
 from .jwt_service import JWTService
 
@@ -43,7 +43,15 @@ class AuthService:
 
     def _make_response(self, access_token: str, refresh_token: str) -> Response:
         """Метод формирует и возвращает окончательный Response"""
-        return jsonify({"access_token": access_token, "refresh_token": refresh_token})
+        return jsonify(access_token=access_token, refresh_token=refresh_token)
+
+    def _make_tokens(self, user, fresh: t.Optional[bool] = False) -> tuple[str, str]:
+        """Формируем токены"""
+        access_token = self.token_service.gen_access_token(user, fresh)
+        refresh_token = self.token_service.gen_refresh_token(user)
+        # сохраняем рефреш токен в бд
+        self.token_service.save_refresh_token(token=refresh_token, user_id=user.id)
+        return access_token, refresh_token
 
     def sign_in(self, data: dict) -> Response:
         """Метод выполняет процедуру входа пользователя в сервис
@@ -52,6 +60,16 @@ class AuthService:
         user = self.user_service.get_by_username(data["username"])
         if not user or not user.verify_password(data["password"]):
             raise WrongCredentials("Wrong username or password")
-        access_token = self.token_service.gen_access_token(user)
-        refresh_token = self.token_service.gen_refresh_token(user)
+        access_token, refresh_token = self._make_tokens(user, fresh=True)
         return self._make_response(access_token, refresh_token)
+
+    def refresh_jwt(self):
+        """Метод выполняет процедуру refresh jwt.
+        Если refresh token есть в бд то всё ок, выдаем новые токены, а если нет то отказ
+        """
+        is_exists, user = self.token_service.is_exists_refresh_token()
+        if is_exists:
+            access_token, refresh_token = self._make_tokens(user)
+            return self._make_response(access_token, refresh_token)
+        else:
+            raise RefreshTokenInvalid("Refresh token not found or was revoked")

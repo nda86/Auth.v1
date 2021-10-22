@@ -57,6 +57,22 @@ def login_user(flask_client):
 
 
 @pytest.fixture
+def make_refresh_request(flask_client):
+    """Фикстура принимает словарь параметров и инициирует создание пользователя"""
+    def inner(refresh_token: str):
+        rv = flask_client.post("/auth/refresh", headers={"Authorization": f"Bearer {refresh_token}"})
+        return rv
+    return inner
+
+
+@pytest.fixture
+def make_refresh_token(create_user, login_user):
+    create_user(dict(username="test_refresh", password="test_refresh"))
+    rv = login_user(dict(username="test_refresh", password="test_refresh"))
+    return rv.json.get("refresh_token")
+
+
+@pytest.fixture
 def make_get_request(http_client):
     """Фикстура выполняет get запрос к тестируемому сервису"""
     def inner(path: str, params: t.Optional[dict] = None, headers: t.Optional[dict] = None) -> HTTPResponse:
