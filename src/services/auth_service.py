@@ -1,6 +1,6 @@
 import functools
 
-from flask import request, abort, jsonify
+from flask import request, Response, jsonify
 from marshmallow import ValidationError, EXCLUDE
 from injector import inject
 
@@ -19,7 +19,10 @@ class AuthService:
 
     @classmethod
     def validate_request(cls, schema):
-        """Метод возвращает декоратор для валидации входящего запроса"""
+        """Метод возвращает декоратор для валидации входящего запроса
+        :type schema: модель-схема описывает формат валидных входящих данных
+        """
+
         def decorator(f):
             @functools.wraps(f)
             def decorated_function(*args, **kwargs):
@@ -33,18 +36,22 @@ class AuthService:
                 except ValidationError as err:
                     raise ApiValidationException(err.messages)
                 return f(*args, data=data, **kwargs)
+
             return decorated_function
+
         return decorator
 
-    def sign_in(self, data):
-        """Метод выполняет процедуру входа пользователя в сервис"""
+    def _make_response(self, access_token: str, refresh_token: str) -> Response:
+        """Метод формирует и возвращает окончательный Response"""
+        return jsonify({"access_token": access_token, "refresh_token": refresh_token})
+
+    def sign_in(self, data: dict) -> Response:
+        """Метод выполняет процедуру входа пользователя в сервис
+        data - провалидированные данные полученные от пользователя
+        """
         user = self.user_service.get_by_username(data["username"])
         if not user or not user.verify_password(data["password"]):
             raise WrongCredentials("Wrong username or password")
         access_token = self.token_service.gen_access_token(user)
-        return jsonify({"access_token": access_token})
-
-    def _gen_jwt(self):
-        """Метод генерирует и возвращает jwt"""
-
-
+        refresh_token = self.token_service.gen_refresh_token(user)
+        return self._make_response(access_token, refresh_token)
