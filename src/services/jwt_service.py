@@ -22,12 +22,14 @@ class JWTService:
         access_token = create_access_token(identity=user, fresh=fresh)
         return access_token
 
-    def gen_refresh_token(self, user: object) -> str:
+    @staticmethod
+    def gen_refresh_token(user: object) -> str:
         """Генерирует и возвращает access token"""
         refresh_token = create_refresh_token(user)
         return refresh_token
 
-    def save_refresh_token(self, token: str, user_id) -> None:
+    @staticmethod
+    def save_refresh_token(token: str, user_id) -> None:
         """Сохраняем refresh token's jti в бд."""
         jti = get_jti(token)
         token_obj = RefreshToken(token=jti, user_id=user_id)
@@ -38,20 +40,23 @@ class JWTService:
             auth_logger.error(f"Неожиданная ошибка в бд при сохранение refresh токена\n{str(e)}")
             raise DBMaintainException("Something went wrong")
 
-    def is_exists_refresh_token(self) -> tuple[bool, t.Optional["current_user"]]:
+    @staticmethod
+    def remove_refresh_token(refresh_token: RefreshToken) -> None:
+        """Метод для удаления рефреш токена из бд"""
+        db.session.delete(refresh_token)
+        try:
+            db.session.commit()
+        except sqlalchemy.exc.DatabaseError as e:
+            auth_logger.error(f"Неожиданная ошибка в бд при удалении refresh токена\n{str(e)}")
+            raise DBMaintainException("Something went wrong")
+
+    @staticmethod
+    def is_exists_refresh_token() -> tuple[bool, t.Optional[RefreshToken], t.Optional["current_user"]]:
         """Проверяем есть ли в бд такой токен для пользователя.
-        Если есть то удаляем его и возвращаем True и current_user если такого токена нет,
-        то False и None
         """
         jti = get_jwt()["jti"]
         refresh_token = RefreshToken.query.filter_by(user_id=current_user.id, token=jti).first()
         if refresh_token:
-            db.session.delete(refresh_token)
-            try:
-                db.session.commit()
-                return True, current_user
-            except sqlalchemy.exc.DatabaseError as e:
-                auth_logger.error(f"Неожиданная ошибка в бд при удалении refresh токена\n{str(e)}")
-                raise DBMaintainException("Something went wrong")
+            return True, refresh_token, current_user
         else:
-            return False, None
+            return False, None, None
