@@ -10,6 +10,7 @@ from flask_jwt_extended import JWTManager
 from werkzeug.exceptions import HTTPException
 
 from src.core.config import settings
+from src.core.logger import init_log_config
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -22,6 +23,7 @@ def create_app(test_config: t.Optional[object] = None) -> Flask:
 
     if test_config is None:
         app.config.from_object(settings)
+        init_log_config()  # инициализируем настройки логгера
     else:
         app.config.from_object(test_config)
 
@@ -50,7 +52,7 @@ def create_app(test_config: t.Optional[object] = None) -> Flask:
     migrate.init_app(app, db, render_as_batch=is_sqlite, compare_type=True)
 
     from .api.v1 import create_api
-    create_api(app)
+    create_api(app)  # регистрируем blueprint для API
 
     @app.errorhandler(HTTPException)
     def json_exc_handler(e: HTTPException):

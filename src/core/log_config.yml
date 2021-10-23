@@ -1,0 +1,18 @@
+version: 1
+
+formatters:
+  std_format:
+    format: "{asctime} - {module} - {funcName} - {levelname} - {message}"
+    style: "{"
+
+handlers:
+  file_handler:
+    class: logging.FileHandler
+    filename: logs/auth.log
+    level: DEBUG
+    formatter: std_format
+
+loggers:
+  auth_logger:
+    level: DEBUG
+    handlers: [file_handler]
