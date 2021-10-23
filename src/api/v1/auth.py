@@ -1,6 +1,9 @@
+"""
+Обрабатывает входящие запросы на /auth/*
+"""
+
 from flask import Blueprint
 from flask_jwt_extended import jwt_required
-
 
 from src.schemas.user_schema import SignUpSchema, SignInSchema
 from src.services import UserService, AuthService

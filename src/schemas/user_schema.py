@@ -1,3 +1,7 @@
+"""
+Схемы используемые для валидации входящих запросов
+"""
+
 from marshmallow import fields, validate
 
 from src import ma

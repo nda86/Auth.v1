@@ -1,6 +1,5 @@
 from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
-from injector import inject
 from marshmallow import EXCLUDE, validates
 
 from .common import UUIDMixin, TimeStampedMixin
@@ -45,12 +44,6 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
     """Класс для валидации создаваемой модели,
     перед записью в бд. Проверяет на существующие username и email
     """
-
-    # @inject
-    # def __init__(self, service: "UserService"):
-    #     """Инжектим UserService"""
-    #     self.service = service
-    #     super().__init__()
 
     class Meta:
         model = User
