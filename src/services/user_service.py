@@ -4,6 +4,7 @@ import sqlalchemy.exc
 from src import db
 from src.models.user import User, UserSchema
 from src.exceptions import DBMaintainException
+from src.core.logger import auth_logger
 
 
 class UserService:
@@ -15,7 +16,10 @@ class UserService:
 
     def create_user(self, data: dict):
         """Создание пользователя в БД - регистрация"""
+        # здесь при загрузке данных в схему, будет проведена проверка уникальности username и email
+        # в случае если поле не уникально будет кинуты соответсвующее исключение и на клиент вернётся описание ошибки
         self.schema().load(data)
+
         password = data.pop("password", None)
         # в метод не должны попадать данные пользователя  без пароля
         # необходимо обязательно проводить валидацию входных параметров перед вызовом этого метода
@@ -25,8 +29,9 @@ class UserService:
         db.session.add(user)
         try:
             db.session.commit()
-        except sqlalchemy.exc.DatabaseError:
+        except sqlalchemy.exc.DatabaseError as e:
             """В случае ошибки создания записи в бд"""
+            auth_logger.error(f"Неожиданная ошибка в бд при сохранение пользователя\n{str(e)}")
             raise DBMaintainException("Something went wrong. Please try again later")
         else:
             return jsonify({"user": "created"}), 200

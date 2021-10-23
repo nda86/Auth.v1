@@ -5,6 +5,7 @@ from marshmallow import EXCLUDE, validates
 from .common import UUIDMixin, TimeStampedMixin
 from src import db, ma
 from src.exceptions import DBValidationException
+from src.core.logger import auth_logger
 
 
 class User(db.Model, UUIDMixin, TimeStampedMixin):
@@ -53,9 +54,11 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
     @validates("username")
     def validate_username(self, value):
         if current_app.user_service.is_username_registered(value):
+            auth_logger.debug(f"Ошибка регистрации пользователя. Username {value} уже занято")
             raise DBValidationException("Username already exists.")
 
     @validates("email")
     def validate_email(self, value):
         if current_app.user_service.is_email_registered(value):
+            auth_logger.debug(f"Ошибка регистрации пользователя. Email {value} уже использован")
             raise DBValidationException("Email is already registered.")

@@ -6,6 +6,7 @@ from src import db
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jti, current_user, get_jwt
 
 from src.models.refresh_token import RefreshToken
+from src.core.logger import auth_logger
 from src.exceptions import DBMaintainException
 
 
@@ -33,12 +34,13 @@ class JWTService:
         db.session.add(token_obj)
         try:
             db.session.commit()
-        except sqlalchemy.exc.DatabaseError:
+        except sqlalchemy.exc.DatabaseError as e:
+            auth_logger.error(f"Неожиданная ошибка в бд при сохранение refresh токена\n{str(e)}")
             raise DBMaintainException("Something went wrong")
 
     def is_exists_refresh_token(self) -> tuple[bool, t.Optional["current_user"]]:
         """Проверяем есть ли в бд такой токен для пользователя.
-        Если есть то удаляем его и возвращаем True, и current_user если такого токена нет,
+        Если есть то удаляем его и возвращаем True и current_user если такого токена нет,
         то False и None
         """
         jti = get_jwt()["jti"]
@@ -48,7 +50,8 @@ class JWTService:
             try:
                 db.session.commit()
                 return True, current_user
-            except sqlalchemy.exc.DatabaseError:
+            except sqlalchemy.exc.DatabaseError as e:
+                auth_logger.error(f"Неожиданная ошибка в бд при удалении refresh токена\n{str(e)}")
                 raise DBMaintainException("Something went wrong")
         else:
             return False, None

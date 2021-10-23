@@ -6,6 +6,7 @@ from marshmallow import ValidationError, EXCLUDE
 from injector import inject
 
 from src.exceptions import ApiValidationException, WrongCredentials, RefreshTokenInvalid
+from src.core.logger import auth_logger
 from .user_service import UserService
 from .jwt_service import JWTService
 
@@ -37,8 +38,10 @@ class AuthService:
                     elif request.form:
                         data = schema().load(request.form, unknown=EXCLUDE)
                     else:
+                        auth_logger.error("В запросе нет данных")
                         raise ApiValidationException("Data not found")
                 except ValidationError as err:
+                    auth_logger.error(f"Ошибка валидации запроса {err.messages}")
                     raise ApiValidationException(err.messages)
                 return f(*args, data=data, **kwargs)
 
@@ -56,6 +59,7 @@ class AuthService:
         refresh_token = self.token_service.gen_refresh_token(user)
         # сохраняем рефреш токен в бд
         self.token_service.save_refresh_token(token=refresh_token, user_id=user.id)
+        auth_logger.debug(f"Создана пар токенов для пользователя с id {user.id}")
         return access_token, refresh_token
 
     def sign_in(self, data: dict) -> Response:
@@ -64,6 +68,7 @@ class AuthService:
         """
         user = self.user_service.get_by_username(data["username"])
         if not user or not user.verify_password(data["password"]):
+            auth_logger.debug("Попытка входа с неверными учётными данными")
             raise WrongCredentials("Wrong username or password")
         access_token, refresh_token = self._make_tokens(user, fresh=True)
         return self._make_response(access_token, refresh_token)
@@ -77,4 +82,5 @@ class AuthService:
             access_token, refresh_token = self._make_tokens(user)
             return self._make_response(access_token, refresh_token)
         else:
+            auth_logger.debug("Попытка получить новый access token по несуществующему refresh токену")
             raise RefreshTokenInvalid("Refresh token not found or was revoked")
