@@ -10,7 +10,9 @@ from src.exceptions import DBMaintainException
 
 
 class JWTService:
-    """Сервис для работы с JWT"""
+    """Сервис для работы с JWT.
+    Генерация токенов, хранение и удаление токенов из хранилища и т.д
+    """
 
     def gen_access_token(self, user: object, fresh: bool = False) -> str:
         """Генерирует и возвращает access token"""
@@ -31,8 +33,8 @@ class JWTService:
         db.session.add(token_obj)
         try:
             db.session.commit()
-        except sqlalchemy.exc.DatabaseError as e:
-            pass
+        except sqlalchemy.exc.DatabaseError:
+            raise DBMaintainException("Something went wrong")
 
     def is_exists_refresh_token(self) -> tuple[bool, t.Optional["current_user"]]:
         """Проверяем есть ли в бд такой токен для пользователя.
@@ -46,7 +48,7 @@ class JWTService:
             try:
                 db.session.commit()
                 return True, current_user
-            except sqlalchemy.exc.DatabaseError as e:
-                raise DBMaintainException
+            except sqlalchemy.exc.DatabaseError:
+                raise DBMaintainException("Something went wrong")
         else:
             return False, None

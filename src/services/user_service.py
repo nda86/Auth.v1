@@ -7,7 +7,9 @@ from src.exceptions import DBMaintainException
 
 
 class UserService:
-    """Класс для выполнения необходимых действий над пользователями"""
+    """Сервис для выполнения необходимых действий над пользователями
+    Создание пользователя, поиск пользователей в хранилище и т.д
+    """
     model = User
     schema = UserSchema
 
@@ -23,11 +25,11 @@ class UserService:
         db.session.add(user)
         try:
             db.session.commit()
-        except sqlalchemy.exc.DatabaseError as e:
+        except sqlalchemy.exc.DatabaseError:
             """В случае ошибки создания записи в бд"""
             raise DBMaintainException("Something went wrong. Please try again later")
         else:
-            return jsonify({"user": "creaaaaaaaated"}), 200
+            return jsonify({"user": "created"}), 200
 
     def get_all(self):
         users = User.query.all()

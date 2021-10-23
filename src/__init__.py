@@ -49,7 +49,6 @@ def create_app(test_config: t.Optional[object] = None) -> Flask:
 
     migrate.init_app(app, db, render_as_batch=is_sqlite, compare_type=True)
 
-
     from .api.v1 import create_api
     create_api(app)
 
