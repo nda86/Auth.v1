@@ -75,10 +75,11 @@ class AuthService:
 
     def refresh_jwt(self):
         """Метод выполняет процедуру refresh jwt.
-        Если refresh token есть в бд то всё ок, выдаем новые токены, а если нет то отказ
+        Если refresh token из запроса есть в бд то всё ок, удаляем его из бд и выдаем новые токены, а если нет то отказ
         """
-        is_exists, user = self.token_service.is_exists_refresh_token()
+        is_exists, old_refresh_token, user = self.token_service.is_exists_refresh_token()
         if is_exists:
+            self.token_service.remove_refresh_token(old_refresh_token)
             access_token, refresh_token = self._make_tokens(user)
             return self._make_response(access_token, refresh_token)
         else:
