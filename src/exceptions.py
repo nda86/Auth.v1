@@ -4,6 +4,8 @@
 Сейчас просто просто прописываем свои атрибуты, к которым можем обращаться в обработчиках исключений.
 """
 
+import typing as t
+
 from werkzeug.exceptions import HTTPException
 
 
@@ -35,8 +37,8 @@ class DBMaintainException(HTTPException):
     code = 500
     name = "System error in database"
 
-    def __init__(self, description: str):
-        self.description = description
+    def __init__(self, description: t.Optional[str] = None):
+        self.description = description or "Something went wrong. Please try again later"
         super().__init__()
 
 

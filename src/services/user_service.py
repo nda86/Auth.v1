@@ -32,7 +32,7 @@ class UserService:
         except sqlalchemy.exc.DatabaseError as e:
             """В случае ошибки создания записи в бд"""
             auth_logger.error(f"Неожиданная ошибка в бд при сохранение пользователя\n{str(e)}")
-            raise DBMaintainException("Something went wrong. Please try again later")
+            raise DBMaintainException()
         else:
             return jsonify({"user": "created"}), 200
 

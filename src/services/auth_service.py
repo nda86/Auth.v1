@@ -49,7 +49,8 @@ class AuthService:
 
         return decorator
 
-    def _make_response(self, access_token: str, refresh_token: str) -> Response:
+    @staticmethod
+    def _make_response(access_token: str, refresh_token: str) -> Response:
         """Метод формирует и возвращает окончательный Response"""
         return jsonify(access_token=access_token, refresh_token=refresh_token)
 
