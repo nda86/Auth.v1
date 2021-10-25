@@ -85,4 +85,6 @@ class AuthService:
             return self._make_response(access_token, refresh_token)
         else:
             auth_logger.debug("Попытка получить новый access token по несуществующему refresh токену")
-            raise RefreshTokenInvalid("Refresh token not found or was revoked")
+            raise RefreshTokenInvalid(
+                "Refresh token not found or was stolen. Please make sign-in and logout all other devices"
+            )

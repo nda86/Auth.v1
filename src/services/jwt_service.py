@@ -40,7 +40,7 @@ class JWTService:
     def is_exists_refresh_token(self) -> tuple[bool, t.Optional[str], t.Optional["current_user"]]:
         """Проверяем есть ли в бд токен который прищел в заголовке Authorization.
         """
-        jti = get_jwt()["jti"]
+        jti = get_jwt()["jti"]  # получаем jti токена из заголовка
         refresh_token = self.storage.get_token_by_jti(token_jti=jti, user_id=current_user.id)
         if refresh_token:
             return True, jti, current_user
