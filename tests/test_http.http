@@ -1,3 +1,6 @@
+GET http://localhost:5000/auth/login_history
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNjM1MTgxOTg5LCJqdGkiOiJiZDhlMjlmMi03M2ViLTQxYzgtYWZmOC1jMWE0M2FiYTBjMGIiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiOTUyYmNjNWQtOTY1NC00YzdiLWFmZTctYWFjNDU5ZGVkMTliIiwibmJmIjoxNjM1MTgxOTg5LCJleHAiOjE2MzUxODI4ODksInJ0IjoiMGZmZDE3MzEtNDVjOC00NWRjLWFiYjctNjU5M2U2MTQyYmMwIn0.BzsUXQUVn_NlS1UZgxjfVqmWEfDgKUEJ-OOGC_1oTts
+###
 POST http://localhost:5000/auth/logout
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNjM1MTU2NjkxLCJqdGkiOiI4M2Q3MjU1MC0yNzY0LTQ4MTgtOGYyMy0wN2EwMWU3MmMxMjUiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiNmU4ZjM5ZGYtYzUxOC00NDEzLTllZGEtYWE4YzRhZGRhYmQxIiwibmJmIjoxNjM1MTU2NjkxLCJleHAiOjE2MzUxNTc1OTEsInJ0IjoiMGM5MjU3ODktYjY0NC00NmI4LWJkMjUtMjgwYjc5NDcxYjg0In0.7njI83jBpGzU7xyZRQW6WICxJe6dO7YuGQTRv0_ZNdA
 ###
@@ -9,6 +12,8 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6ZmFsc2UsI
 ###
 POST http://localhost:5000/auth/sign-in
 Content-Type: application/json
+User-Agent: Drevokol 5000
+
 
 {
   "username": "flask",

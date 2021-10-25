@@ -5,7 +5,9 @@
 """
 
 import typing as t
+import json
 
+from flask import Flask
 from werkzeug.exceptions import HTTPException
 
 
@@ -60,3 +62,19 @@ class RefreshTokenInvalid(HTTPException):
     def __init__(self, description: str):
         self.description = description
         super().__init__()
+
+
+def init_error_handler(app: Flask):
+    """Подключаем к приложению обработчики ошибок"""
+
+    @app.errorhandler(HTTPException)
+    def json_exc_handler(e: HTTPException):
+        """Отлавливает все HTTPException и отдает ответ об ошибке в формате json"""
+        resp = e.get_response()
+        resp.data = json.dumps({
+            "code": e.code,
+            "name": e.name,
+            "description": e.description
+        })
+        resp.content_type = "application/json"
+        return resp

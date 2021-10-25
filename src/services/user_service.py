@@ -1,3 +1,5 @@
+from functools import wraps
+
 from flask import jsonify
 import sqlalchemy.exc
 
@@ -5,6 +7,20 @@ from src import db
 from src.models.user import User, UserSchema
 from src.exceptions import DBMaintainException
 from src.core.logger import auth_logger
+
+
+def sql_error_handler(f):
+    """Декоратор перехватывает все неожиданные ошибки при работе sqlalchemy"""
+    @wraps(f)
+    def inner(*args, **kwargs):
+        try:
+            res = f(*args, **kwargs)
+        except sqlalchemy.exc.SQLAlchemyError as e:
+            auth_logger.error(f"Неожиданная ошибка в бд\n{str(e)}")
+            raise DBMaintainException()
+        else:
+            return res
+    return inner
 
 
 class UserService:
@@ -36,6 +52,7 @@ class UserService:
         else:
             return jsonify({"user": "created"}), 200
 
+    @sql_error_handler
     def get_all(self):
         users = User.query.all()
         return users
@@ -48,14 +65,17 @@ class UserService:
         """Проверка на существующий `email`"""
         return bool(self.get_by_email(value))
 
+    @sql_error_handler
     def get_by_username(self, value):
         """Поиск пользователя по `username`"""
         return self.model.query.filter_by(username=value).first()
 
+    @sql_error_handler
     def get_by_email(self, value):
         """Поиск пользователя по `email`"""
         return self.model.query.filter_by(email=value).first()
 
+    @sql_error_handler
     def get_by_id(self, value):
         """Поиск пользователя по `id`"""
         return self.model.query.filter_by(id=value).first()

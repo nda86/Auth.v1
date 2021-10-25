@@ -40,7 +40,7 @@ def http_client() -> requests:
 
 
 @pytest.fixture
-def make_flask_request(flask_client):
+def make_flask_post_request(flask_client):
     """Выполнение тестового запроса"""
     def inner(path: str, data: t.Optional[dict] = None, headers: t.Optional[dict] = None):
         path = path.lstrip("/")
@@ -50,21 +50,31 @@ def make_flask_request(flask_client):
 
 
 @pytest.fixture
-def create_user(make_flask_request):
+def make_flask_get_request(flask_client):
+    """Выполнение тестового запроса"""
+    def inner(path: str, headers: t.Optional[dict] = None):
+        path = path.lstrip("/")
+        rv = flask_client.get(f"/auth/{path}", headers=headers)
+        return rv
+    return inner
+
+
+@pytest.fixture
+def create_user(make_flask_post_request):
     """Фикстура для создания пользователя"""
-    return partial(make_flask_request, path="sign-up")
+    return partial(make_flask_post_request, path="sign-up")
 
 
 @pytest.fixture
-def login_user(make_flask_request):
+def login_user(make_flask_post_request):
     """Фикстура для логина пользователя через логи/пароль"""
-    return partial(make_flask_request, path="sign-in")
+    return partial(make_flask_post_request, path="sign-in")
 
 
 @pytest.fixture
-def logout_user(make_flask_request):
+def logout_user(make_flask_post_request):
     """Фикстура для выхода пользователя"""
-    return partial(make_flask_request, path="logout")
+    return partial(make_flask_post_request, path="logout")
 
 
 @pytest.fixture

@@ -3,10 +3,13 @@ import typing as t
 
 from flask import request, Response, jsonify
 from marshmallow import ValidationError, EXCLUDE
+from sqlalchemy.exc import SQLAlchemyError
 from injector import inject
 
-from src.exceptions import ApiValidationException, WrongCredentials, RefreshTokenInvalid
+from src.exceptions import ApiValidationException, WrongCredentials, RefreshTokenInvalid, DBMaintainException
 from src.core.logger import auth_logger
+from src import db
+from src.models import LoginHistory, User
 from .user_service import UserService
 from .jwt_service import JWTService
 
@@ -50,7 +53,7 @@ class AuthService:
         return decorator
 
     @staticmethod
-    def _make_response(data: t.Union[dict, str]) -> Response:
+    def _make_response(data: t.Union[dict, str, list]) -> Response:
         """Метод формирует и возвращает окончательный Response"""
         return jsonify(data)
 
@@ -62,6 +65,23 @@ class AuthService:
         auth_logger.debug(f"Создана пар токенов для пользователя с id {user.id}")
         return access_token, refresh_token
 
+    @staticmethod
+    def _add_login_history(user: User) -> None:
+        """
+        Добавляем запись в историю входов пользователя
+        """
+        rec_login_history = LoginHistory()
+        rec_login_history.user_id = user.id
+        rec_login_history.user_agent = request.user_agent.string
+        rec_login_history.ip = request.remote_addr
+        db.session.add(rec_login_history)
+        try:
+            db.session.commit()
+        except SQLAlchemyError as e:
+            # в случае ошибка процесс логина не прерываем, а просто заносим данные в лог в лог
+            auth_logger.error(f"Ошибка при добавлении записи в историю посещений\n{str(e)}")
+            auth_logger.error(f"{rec_login_history.user_id=}/n{rec_login_history.user_agent=}\n{rec_login_history.ip}")
+
     def sign_in(self, data: dict) -> Response:
         """Метод выполняет процедуру входа пользователя в сервис
         data - провалидированные данные полученные от пользователя
@@ -70,6 +90,7 @@ class AuthService:
         if not user or not user.verify_password(data["password"]):
             auth_logger.debug("Попытка входа с неверными учётными данными")
             raise WrongCredentials("Wrong username or password")
+        self._add_login_history(user)
         access_token, refresh_token = self._make_tokens(user, fresh=True)
         return self._make_response(dict(access_token=access_token, refresh_token=refresh_token))
 
@@ -104,3 +125,16 @@ class AuthService:
         user_id = self.token_service.get_claim_from_token("sub")
         self.token_service.remove_refresh_tokens(user_id=user_id)
         return self._make_response({"logout_all": "ok"})
+
+    def login_history(self):
+        """Метод возвращает историю посещений пользователя".
+        """
+        user_id = self.token_service.get_claim_from_token("sub")  # получаем id текущего пользователя
+        query = db.session.query(LoginHistory).filter(LoginHistory.user_id == user_id)
+        try:
+            history_log = query.all()
+        except SQLAlchemyError as e:
+            auth_logger.error(f"Ошибка при запросе истории логинов пользователя {user_id}\n{str(e)}")
+            raise DBMaintainException()
+        else:
+            return self._make_response([log.dict() for log in history_log])

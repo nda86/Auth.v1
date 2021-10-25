@@ -9,7 +9,7 @@ def test_success_logout(make_refresh_token, make_refresh_request, logout_user):
       2. по нему получаем новые access и refresh
       3. делаем logout используя access токен полученный на шаге 2
       4. пробуем получить access токен используя refresh токен полученный на шаге 2
-      Как итог бы должны получить 401 код
+      Как итог мы должны получить 401 код
     """
 
     res = make_refresh_request(make_refresh_token)

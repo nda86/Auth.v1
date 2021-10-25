@@ -7,7 +7,6 @@ from flask_jwt_extended import jwt_required
 
 from src.schemas.user_schema import SignUpSchema, SignInSchema
 from src.services import UserService, AuthService
-from src.core.logger import auth_logger
 
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
@@ -23,25 +22,25 @@ def test_route():
 @auth_bp.route("/sign-up", methods=["POST"])
 @AuthService.validate_request(SignUpSchema)
 def sign_up(data, user_service: UserService):
-    """ data это словарь данных возвращаемым декоратором @validate_request.
+    """Запрос на регистрацию пользователя
+    data это словарь данных возвращаемым декоратором @validate_request.
     Объект типа UserService попадает сюда с помощью DI, реализованной библиотекой flask_injector
     Подробности: https://github.com/alecthomas/flask_injector
     """
-    auth_logger.debug("Запрос на регистрацию пользователя")
     return user_service.create_user(data)
 
 
 @auth_bp.route("/sign-in", methods=["POST"])
 @AuthService.validate_request(schema=SignInSchema)
 def sign_in(data, auth_service: AuthService):
-    auth_logger.debug("Запрос на вход пользователя в систему")
+    """Запрос на вход пользователя в систему"""
     return auth_service.sign_in(data)
 
 
 @auth_bp.route("/refresh", methods=["POST"])
 @jwt_required(refresh=True)
 def refresh(auth_service: AuthService):
-    auth_logger.debug("Запрос на обновление access токена")
+    """Запрос на обновление access токена"""
     return auth_service.refresh_jwt()
 
 
@@ -57,3 +56,10 @@ def logout(auth_service: AuthService):
 def logout_all(auth_service: AuthService):
     """Запрос на выход из аккаунта со всех устройств"""
     return auth_service.logout_all()
+
+
+@auth_bp.route("/login_history", methods=["GET"])
+@jwt_required()
+def login_history(auth_service: AuthService):
+    """Запрос истории посещений"""
+    return auth_service.login_history()

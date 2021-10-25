@@ -1,4 +1,3 @@
-import json
 import typing as t
 
 from flask import Flask
@@ -7,7 +6,6 @@ from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
 from flask_injector import FlaskInjector
 from flask_jwt_extended import JWTManager
-from werkzeug.exceptions import HTTPException
 
 from src.core.config import settings
 from src.core.logger import init_log_config
@@ -54,17 +52,8 @@ def create_app(test_config: t.Optional[object] = None) -> Flask:
     from .api.v1 import create_api
     create_api(app)  # регистрируем blueprint для API
 
-    @app.errorhandler(HTTPException)
-    def json_exc_handler(e: HTTPException):
-        """Отлавливает все HTTPException и отдает ответ об ошибке в формате json"""
-        resp = e.get_response()
-        resp.data = json.dumps({
-            "code": e.code,
-            "name": e.name,
-            "description": e.description
-        })
-        resp.content_type = "application/json"
-        return resp
+    from .exceptions import init_error_handler
+    init_error_handler(app)  # подключаем обработчики ошибок
 
     @app.route("/ping")
     def hello():
