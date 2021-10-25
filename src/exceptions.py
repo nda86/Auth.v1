@@ -4,6 +4,8 @@
 Сейчас просто просто прописываем свои атрибуты, к которым можем обращаться в обработчиках исключений.
 """
 
+import typing as t
+
 from werkzeug.exceptions import HTTPException
 
 
@@ -30,13 +32,13 @@ class ApiValidationException(HTTPException):
 
 
 class DBMaintainException(HTTPException):
-    """EXC бросаем его если в бд случилась непредвиденная ошибка.
-    Клиенту просто отдаём код 500 с общим описание что-то пошло не так"""
+    """EXC бросаем его если при работе с каким то хранилищем postgres, redis и т.д случилась непредвиденная ошибка.
+    Клиенту просто отдаём код 500 с общим описание что-то пошло не так. А в логах фиксируем реальную ошибку."""
     code = 500
     name = "System error in database"
 
-    def __init__(self, description: str):
-        self.description = description
+    def __init__(self, description: t.Optional[str] = None):
+        self.description = description or "Something went wrong. Please try again later"
         super().__init__()
 
 

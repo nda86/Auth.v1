@@ -49,7 +49,8 @@ class AuthService:
 
         return decorator
 
-    def _make_response(self, access_token: str, refresh_token: str) -> Response:
+    @staticmethod
+    def _make_response(access_token: str, refresh_token: str) -> Response:
         """Метод формирует и возвращает окончательный Response"""
         return jsonify(access_token=access_token, refresh_token=refresh_token)
 
@@ -77,9 +78,9 @@ class AuthService:
         """Метод выполняет процедуру refresh jwt.
         Если refresh token из запроса есть в бд то всё ок, удаляем его из бд и выдаем новые токены, а если нет то отказ
         """
-        is_exists, old_refresh_token, user = self.token_service.is_exists_refresh_token()
+        is_exists, old_refresh_token_jti, user = self.token_service.is_exists_refresh_token()
         if is_exists:
-            self.token_service.remove_refresh_token(old_refresh_token)
+            self.token_service.remove_refresh_token(token_jti=old_refresh_token_jti, user_id=user.id)
             access_token, refresh_token = self._make_tokens(user)
             return self._make_response(access_token, refresh_token)
         else:
