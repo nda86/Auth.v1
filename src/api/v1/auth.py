@@ -63,3 +63,10 @@ def logout_all(auth_service: AuthService):
 def login_history(auth_service: AuthService):
     """Запрос истории посещений"""
     return auth_service.login_history()
+
+
+@auth_bp.route("/me", methods=["GET"])
+@jwt_required()
+def me(auth_service: AuthService):
+    """Запрос пользовательского профиля"""
+    return auth_service.me()

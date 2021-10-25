@@ -138,3 +138,10 @@ class AuthService:
             raise DBMaintainException()
         else:
             return self._make_response([log.dict() for log in history_log])
+
+    def me(self):
+        """Метод возвращает профиль пользователя".
+        """
+        user_id = self.token_service.get_claim_from_token("sub")  # получаем id текущего пользователя
+        user = self.user_service.get_by_id(user_id)
+        return self._make_response(user.dict())

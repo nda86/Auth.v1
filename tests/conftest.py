@@ -23,7 +23,7 @@ class HTTPResponse:
     status: int
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def flask_client() -> FlaskClient:
     """Клиент для тестирования сервиса на flask"""
     app = create_app(settings)
