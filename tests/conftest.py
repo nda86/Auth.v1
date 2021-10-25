@@ -44,7 +44,7 @@ def make_flask_post_request(flask_client):
     """Выполнение тестового запроса"""
     def inner(path: str, data: t.Optional[dict] = None, headers: t.Optional[dict] = None):
         path = path.lstrip("/")
-        rv = flask_client.post(f"/auth/{path}", data=data, headers=headers)
+        rv = flask_client.post(f"{settings.AUTH_API_URL}/{path}", data=data, headers=headers)
         return rv
     return inner
 
@@ -54,7 +54,7 @@ def make_flask_get_request(flask_client):
     """Выполнение тестового запроса"""
     def inner(path: str, headers: t.Optional[dict] = None):
         path = path.lstrip("/")
-        rv = flask_client.get(f"/auth/{path}", headers=headers)
+        rv = flask_client.get(f"{settings.AUTH_API_URL}/{path}", headers=headers)
         return rv
     return inner
 
@@ -81,7 +81,7 @@ def logout_user(make_flask_post_request):
 def make_refresh_request(flask_client):
     """Фикстура принимает словарь параметров и инициирует создание пользователя"""
     def inner(refresh_token: str):
-        rv = flask_client.post("/auth/refresh", headers={"Authorization": f"Bearer {refresh_token}"})
+        rv = flask_client.post(f"{settings.AUTH_API_URL}/refresh", headers={"Authorization": f"Bearer {refresh_token}"})
         return rv
     return inner
 
@@ -109,7 +109,7 @@ def make_get_request(http_client):
     """
     def inner(path: str, params: t.Optional[dict] = None, headers: t.Optional[dict] = None) -> HTTPResponse:
         path = path.lstrip("/")
-        url = f"{settings.AUTH_URL}/{path}"
+        url = f"{settings.AUTH_SERVICE_URL}/{path}"
         res = http_client.get(url, params=params, headers=headers)
         return HTTPResponse(
             body=res.text,
