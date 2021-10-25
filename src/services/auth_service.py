@@ -50,14 +50,13 @@ class AuthService:
         return decorator
 
     @staticmethod
-    def _make_response(access_token: str, refresh_token: str) -> Response:
+    def _make_response(data: t.Union[dict, str]) -> Response:
         """Метод формирует и возвращает окончательный Response"""
-        return jsonify(access_token=access_token, refresh_token=refresh_token)
+        return jsonify(data)
 
     def _make_tokens(self, user, fresh: t.Optional[bool] = False) -> tuple[str, str]:
         """Формируем токены"""
-        access_token = self.token_service.gen_access_token(user, fresh)
-        refresh_token = self.token_service.gen_refresh_token(user)
+        access_token, refresh_token = self.token_service.gen_tokens(user, fresh)
         # сохраняем рефреш токен в бд
         self.token_service.save_refresh_token(token=refresh_token, user_id=user.id)
         auth_logger.debug(f"Создана пар токенов для пользователя с id {user.id}")
@@ -72,7 +71,7 @@ class AuthService:
             auth_logger.debug("Попытка входа с неверными учётными данными")
             raise WrongCredentials("Wrong username or password")
         access_token, refresh_token = self._make_tokens(user, fresh=True)
-        return self._make_response(access_token, refresh_token)
+        return self._make_response(dict(access_token=access_token, refresh_token=refresh_token))
 
     def refresh_jwt(self):
         """Метод выполняет процедуру refresh jwt.
@@ -82,9 +81,26 @@ class AuthService:
         if is_exists:
             self.token_service.remove_refresh_token(token_jti=old_refresh_token_jti, user_id=user.id)
             access_token, refresh_token = self._make_tokens(user)
-            return self._make_response(access_token, refresh_token)
+            return self._make_response(dict(access_token=access_token, refresh_token=refresh_token))
         else:
             auth_logger.debug("Попытка получить новый access token по несуществующему refresh токену")
             raise RefreshTokenInvalid(
                 "Refresh token not found or was stolen. Please make sign-in and logout all other devices"
             )
+
+    def logout(self):
+        """Метод выполняет процедуру выхода из аккаунта с "этого устройства".
+        Ддя этого удаляем refresh токен связанный с access токеном из запроса
+        """
+        refresh_jti = self.token_service.get_claim_from_token("rt")
+        user_id = self.token_service.get_claim_from_token("sub")
+        self.token_service.remove_refresh_token(token_jti=refresh_jti, user_id=user_id)
+        return self._make_response({"logout": "ok"})
+
+    def logout_all(self):
+        """Метод выполняет процедуру выхода из аккаунта "со всех устройств".
+        Для этого просто удаляем все refresh токены пользователя
+        """
+        user_id = self.token_service.get_claim_from_token("sub")
+        self.token_service.remove_refresh_tokens(user_id=user_id)
+        return self._make_response({"logout_all": "ok"})

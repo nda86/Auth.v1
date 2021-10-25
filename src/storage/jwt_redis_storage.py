@@ -75,4 +75,5 @@ class JWTRedisStorage(JWTStorage):
 
     @redis_error_wrapper
     def remove_all_user_tokens(self, user_id: str) -> None:
-        pass
+        """Удаляем все токены пользователя"""
+        self.redis.delete(self._get_name(user_id, "*"))
