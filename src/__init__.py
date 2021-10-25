@@ -46,10 +46,10 @@ def create_app(test_config: t.Optional[object] = None) -> Flask:
         """
         is_sqlite = db.engine.url.drivername == "sqlite"
 
+    migrate.init_app(app, db, render_as_batch=is_sqlite, compare_type=True)
+
     from .services.user_service import UserService
     app.user_service = UserService()  # кладем в глобальный объект фласка инстанс UserService
-
-    migrate.init_app(app, db, render_as_batch=is_sqlite, compare_type=True)
 
     from .api.v1 import create_api
     create_api(app)  # регистрируем blueprint для API

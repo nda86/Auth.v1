@@ -44,7 +44,7 @@ class DBMaintainException(HTTPException):
 
 class WrongCredentials(HTTPException):
     """EXC бросаем его если пользователь при аутентификации указал неверный логи или пароль"""
-    code = 400
+    code = 401
     name = "Wrong credentials"
 
     def __init__(self, description: str):
