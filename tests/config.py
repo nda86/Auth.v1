@@ -1,4 +1,4 @@
-from pydantic import BaseSettings
+from pydantic import BaseSettings, BaseModel
 
 
 class TestSettings(BaseSettings):

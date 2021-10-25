@@ -1,6 +1,6 @@
 import typing as t
 
-from flask_jwt_extended import create_access_token, create_refresh_token, current_user, get_jwt
+from flask_jwt_extended import create_access_token, create_refresh_token, current_user, get_jwt, get_jti
 from injector import inject
 
 from src.storage import JWTStorage
@@ -15,8 +15,17 @@ class JWTService:
     def __init__(self, storage: JWTStorage):
         self.storage = storage
 
+    def gen_tokens(self, user: object, fresh: bool = False) -> tuple[str, str]:
+        """Формируем пару токенов.
+        Дополнительно в refresh токен кладем jti access токена, чтобы в будущем знать с каким рефреш токеном связан
+        определённый access токен"""
+        access_token = self._gen_access_token(user, fresh)
+        refresh_claims = {"rt": get_jti(access_token)}
+        refresh_token = self._gen_refresh_token(user, add_claims=refresh_claims)
+        return access_token, refresh_token
+
     @staticmethod
-    def gen_access_token(user: object, fresh: bool = False) -> str:
+    def _gen_access_token(user: object, fresh: bool = False, add_claims: t.Optional[dict] = None) -> str:
         """Генерирует и возвращает access token"""
         # важно: ставим флаг fresh=True только при регистрации через логин/пароль
         # при рефреше флаг fresh не ставим
@@ -24,7 +33,7 @@ class JWTService:
         return access_token
 
     @staticmethod
-    def gen_refresh_token(user: object) -> str:
+    def _gen_refresh_token(user: object, add_claims: t.Optional[dict] = None) -> str:
         """Генерирует и возвращает access token"""
         refresh_token = create_refresh_token(user)
         return refresh_token
@@ -46,3 +55,8 @@ class JWTService:
             return True, jti, current_user
         else:
             return False, None, None
+
+    @staticmethod
+    def get_claim_from_ascess(claim: str) -> str:
+        """Метод возвращает значение claim из токена полученного в заголовке"""
+        return get_jwt().get(claim)

@@ -13,10 +13,11 @@ from src.core.logger import auth_logger
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 
-@auth_bp.route("/test")
+@auth_bp.route("/secure")
+@jwt_required
 def test_route():
-    auth_logger.debug("TEST")
-    return jsonify("test")
+    """Роут для проверки доступа только с access токеном"""
+    return jsonify("secure")
 
 
 @auth_bp.route("/sign-up", methods=["POST"])
@@ -42,3 +43,10 @@ def sign_in(data, auth_service: AuthService):
 def refresh(auth_service: AuthService):
     auth_logger.debug("Запрос на обновление access токена")
     return auth_service.refresh_jwt()
+
+
+@auth_bp.route("/logout", methods=["POST"])
+@jwt_required()
+def logout(auth_service: AuthService):
+    auth_logger.debug("Запрос на выход из аккаунта")
+    return auth_service.logout()

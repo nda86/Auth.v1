@@ -19,4 +19,7 @@ def test_refresh_process_only_one(make_refresh_token, make_refresh_request):
     rv = make_refresh_request(refresh_token)
 
     assert rv.status_code == HTTPStatus.UNAUTHORIZED
-    assert rv.json.get("description") == "Refresh token not found or was revoked"
+    assert (
+        rv.json.get("description")
+        == "Refresh token not found or was stolen. Please make sign-in and logout all other devices"
+    )

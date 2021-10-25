@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 from dataclasses import dataclass
 import typing as t
+from functools import partial
 
 import pytest
 import requests
@@ -39,19 +40,32 @@ def http_client() -> requests:
 
 
 @pytest.fixture
-def create_user(flask_client):
-    """Фикстура принимает словарь параметров и инициирует создание пользователя"""
-    def inner(user_data: dict):
-        rv = flask_client.post("/auth/sign-up", data=user_data)
+def flask_request(flask_client):
+    """Выполнение тестового запроса"""
+    def inner(path: str, data: t.Optional[dict] = None, headers: t.Optional[dict] = None):
+        path = path.lstrip("/")
+        rv = flask_client.post(f"/auth/{path}", data=data, headers=headers)
         return rv
     return inner
 
 
 @pytest.fixture
-def login_user(flask_client):
-    """Фикстура принимает словарь параметров и инициирует создание пользователя"""
+def create_user(flask_request):
+    """Фикстура для создания пользователя"""
+    return partial(flask_request, path="sign-up")
+
+
+@pytest.fixture
+def login_user(flask_request):
+    """Фикстура для логина пользователя через логи/пароль"""
+    return partial(flask_request, path="sign-in")
+
+
+@pytest.fixture
+def logout_user(flask_client):
+    """Фикстура для выхода пользователя"""
     def inner(data: dict):
-        rv = flask_client.post("/auth/sign-in", data=data)
+        rv = flask_client.post("/auth/logout", data=data, headers=headers)
         return rv
     return inner
 
@@ -67,14 +81,25 @@ def make_refresh_request(flask_client):
 
 @pytest.fixture
 def make_refresh_token(create_user, login_user):
-    create_user(dict(username="test_refresh", password="test_refresh"))
-    rv = login_user(dict(username="test_refresh", password="test_refresh"))
+    """Получаем refresh токен."""
+    create_user(data=dict(username="test", password="testtest"))
+    rv = login_user(data=dict(username="test", password="testtest"))
     return rv.json.get("refresh_token")
 
 
 @pytest.fixture
+def make_access_token(create_user, login_user):
+    """Получаем refresh токен."""
+    create_user(data=dict(username="test", password="test"))
+    rv = login_user(data=dict(username="test", password="testtest"))
+    return rv.json.get("access_token")
+
+
+@pytest.fixture
 def make_get_request(http_client):
-    """Фикстура выполняет get запрос к тестируемому сервису"""
+    """Фикстура выполняет get запрос к тестируемому сервису.
+    В этом случае не используем тестовый клиент фласка.
+    """
     def inner(path: str, params: t.Optional[dict] = None, headers: t.Optional[dict] = None) -> HTTPResponse:
         path = path.lstrip("/")
         url = f"{settings.AUTH_URL}/{path}"
