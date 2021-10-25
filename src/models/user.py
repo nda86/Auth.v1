@@ -26,6 +26,15 @@ class User(db.Model, UUIDMixin, TimeStampedMixin):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    def dict(self) -> dict:
+        """Приводит объект user к типу dict"""
+        return {
+            "username": self.username,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "email": self.email
+        }
+
     @property
     def password(self):
         """Делаем поле пароль недоступным для чтения"""
