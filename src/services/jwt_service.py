@@ -17,11 +17,11 @@ class JWTService:
 
     def gen_tokens(self, user: object, fresh: bool = False) -> tuple[str, str]:
         """Формируем пару токенов.
-        Дополнительно в refresh токен кладем jti access токена, чтобы в будущем знать с каким рефреш токеном связан
+        Дополнительно в access токен кладем jti refresh токена, чтобы в будущем знать с каким рефреш токеном связан
         определённый access токен"""
-        access_token = self._gen_access_token(user, fresh)
-        refresh_claims = {"rt": get_jti(access_token)}
-        refresh_token = self._gen_refresh_token(user, add_claims=refresh_claims)
+        refresh_token = self._gen_refresh_token(user)
+        access_claims = {"rt": get_jti(refresh_token)}
+        access_token = self._gen_access_token(user, fresh, access_claims)
         return access_token, refresh_token
 
     @staticmethod
@@ -29,13 +29,13 @@ class JWTService:
         """Генерирует и возвращает access token"""
         # важно: ставим флаг fresh=True только при регистрации через логин/пароль
         # при рефреше флаг fresh не ставим
-        access_token = create_access_token(identity=user, fresh=fresh)
+        access_token = create_access_token(identity=user, fresh=fresh, additional_claims=add_claims)
         return access_token
 
     @staticmethod
     def _gen_refresh_token(user: object, add_claims: t.Optional[dict] = None) -> str:
         """Генерирует и возвращает access token"""
-        refresh_token = create_refresh_token(user)
+        refresh_token = create_refresh_token(user, additional_claims=add_claims)
         return refresh_token
 
     def save_refresh_token(self, token: str, user_id) -> None:
@@ -45,6 +45,10 @@ class JWTService:
     def remove_refresh_token(self, token_jti: str, user_id: str) -> None:
         """Метод для удаления рефреш токена из бд"""
         self.storage.remove_token_by_jti(token_jti=token_jti, user_id=user_id)
+
+    def remove_refresh_tokens(self, user_id: str) -> None:
+        """Метод для удаления всех рефреш токенов пользователя из бд"""
+        self.storage.remove_all_user_tokens(user_id=user_id)
 
     def is_exists_refresh_token(self) -> tuple[bool, t.Optional[str], t.Optional["current_user"]]:
         """Проверяем есть ли в бд токен который прищел в заголовке Authorization.
@@ -57,6 +61,6 @@ class JWTService:
             return False, None, None
 
     @staticmethod
-    def get_claim_from_ascess(claim: str) -> str:
-        """Метод возвращает значение claim из токена полученного в заголовке"""
+    def get_claim_from_token(claim: str) -> str:
+        """Метод возвращает значение claim из токена полученного из запроса"""
         return get_jwt().get(claim)

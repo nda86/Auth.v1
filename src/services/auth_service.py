@@ -90,8 +90,17 @@ class AuthService:
 
     def logout(self):
         """Метод выполняет процедуру выхода из аккаунта с "этого устройства".
+        Ддя этого удаляем refresh токен связанный с access токеном из запроса
         """
-        refresh_jti = self.token_service.get_claim_from_ascess("rt")
-        user_id = self.token_service.get_claim_from_ascess("sub")
+        refresh_jti = self.token_service.get_claim_from_token("rt")
+        user_id = self.token_service.get_claim_from_token("sub")
         self.token_service.remove_refresh_token(token_jti=refresh_jti, user_id=user_id)
+        return self._make_response({"logout": "ok"})
 
+    def logout_all(self):
+        """Метод выполняет процедуру выхода из аккаунта "со всех устройств".
+        Для этого просто удаляем все refresh токены пользователя
+        """
+        user_id = self.token_service.get_claim_from_token("sub")
+        self.token_service.remove_refresh_tokens(user_id=user_id)
+        return self._make_response({"logout_all": "ok"})
