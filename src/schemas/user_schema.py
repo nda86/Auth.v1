@@ -20,3 +20,8 @@ class SignInSchema(ma.Schema):
     """Схема для валидации входящих данных при логине пользователя"""
     username = fields.String(required=True)
     password = fields.String(required=True)
+
+
+class UpdatePasswordSchema(ma.Schema):
+    """Схема для валидации входящих данных при смене пароля"""
+    password = fields.String(required=True, load_only=True, validate=[validate.Length(min=8, max=20)])
