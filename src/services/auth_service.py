@@ -1,7 +1,7 @@
 import functools
 import typing as t
 
-from flask import request, Response, jsonify
+from flask import request, Response, jsonify, abort
 from marshmallow import ValidationError, EXCLUDE
 from sqlalchemy.exc import SQLAlchemyError
 from injector import inject
@@ -144,4 +144,6 @@ class AuthService:
         """
         user_id = self.token_service.get_claim_from_token("sub")  # получаем id текущего пользователя
         user = self.user_service.get_by_id(user_id)
+        if not user:
+            abort(404, description="Пользователь не найден")
         return self._make_response(user.dict())

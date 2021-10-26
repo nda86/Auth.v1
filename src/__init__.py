@@ -50,7 +50,7 @@ def create_app(test_config: t.Optional[object] = None) -> Flask:
     app.user_service = UserService()  # кладем в глобальный объект фласка инстанс UserService
 
     from .api.v1 import create_api
-    create_api(app)  # регистрируем blueprint для API
+    create_api(app)  # регистрируем blueprint для API v1
 
     from .exceptions import init_error_handler
     init_error_handler(app)  # подключаем обработчики ошибок
