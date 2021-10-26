@@ -94,7 +94,17 @@ class AuthService:
         access_token, refresh_token = self._make_tokens(user, fresh=True)
         return self._make_response(dict(access_token=access_token, refresh_token=refresh_token))
 
-    def refresh_jwt(self):
+    def sign_up(self, data: dict) -> Response:
+        """Метод выполняет процедуру регистрации пользователя в сервисе
+        data - провалидированные данные полученные от пользователя
+        """
+        user = self.user_service.create_user(data)
+        if user:
+            return self._make_response({f"user:{user.id}": "created"})
+        else:
+            return self._make_response({f"user:{user.id}": "not created"})
+
+    def refresh_jwt(self) -> Response:
         """Метод выполняет процедуру refresh jwt.
         Если refresh token из запроса есть в бд то всё ок, удаляем его из бд и выдаем новые токены, а если нет то отказ
         """
@@ -109,7 +119,7 @@ class AuthService:
                 "Refresh token not found or was stolen. Please make sign-in and logout all other devices"
             )
 
-    def logout(self):
+    def logout(self) -> Response:
         """Метод выполняет процедуру выхода из аккаунта с "этого устройства".
         Ддя этого удаляем refresh токен связанный с access токеном из запроса
         """
@@ -118,7 +128,7 @@ class AuthService:
         self.token_service.remove_refresh_token(token_jti=refresh_jti, user_id=user_id)
         return self._make_response({"logout": "ok"})
 
-    def logout_all(self):
+    def logout_all(self) -> Response:
         """Метод выполняет процедуру выхода из аккаунта "со всех устройств".
         Для этого просто удаляем все refresh токены пользователя
         """
@@ -126,7 +136,7 @@ class AuthService:
         self.token_service.remove_refresh_tokens(user_id=user_id)
         return self._make_response({"logout_all": "ok"})
 
-    def login_history(self):
+    def login_history(self) -> Response:
         """Метод возвращает историю посещений пользователя".
         """
         user_id = self.token_service.get_claim_from_token("sub")  # получаем id текущего пользователя
@@ -139,7 +149,7 @@ class AuthService:
         else:
             return self._make_response([log.dict() for log in history_log])
 
-    def me(self):
+    def me(self) -> Response:
         """Метод возвращает профиль пользователя".
         """
         user_id = self.token_service.get_claim_from_token("sub")  # получаем id текущего пользователя
@@ -147,3 +157,16 @@ class AuthService:
         if not user:
             abort(404, description="Пользователь не найден")
         return self._make_response(user.dict())
+
+    def change_password(self, data: dict) -> Response:
+        """Метод для смены пароля"
+        data - провалидированные данные полученные от пользователя.
+        """
+        user_id = self.token_service.get_claim_from_token("sub")  # получаем id текущего пользователя
+        user = self.user_service.get_by_id(user_id)
+        if not user:
+            auth_logger.debug(f"Попытка смены пароля для пользователя не существующего в бд\n{user.id=}")
+            abort(404, description="Пользователь не найден")
+        self.user_service.change_password(user=user, password=data["password"])
+        auth_logger.debug(f"Пароль для пользователя {user.id} изменён")
+        return self._make_response("Password successfully changed")

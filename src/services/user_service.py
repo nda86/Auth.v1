@@ -1,6 +1,5 @@
 from functools import wraps
 
-from flask import jsonify
 import sqlalchemy.exc
 
 from src import db
@@ -30,7 +29,7 @@ class UserService:
     model = User
     schema = UserSchema
 
-    def create_user(self, data: dict):
+    def create_user(self, data: dict) -> User:
         """Создание пользователя в БД - регистрация"""
         # здесь при загрузке данных в схему, будет проведена проверка уникальности username и email
         # в случае если поле не уникально будет кинуты соответсвующее исключение и на клиент вернётся описание ошибки
@@ -50,7 +49,14 @@ class UserService:
             auth_logger.error(f"Неожиданная ошибка в бд при сохранение пользователя\n{str(e)}")
             raise DBMaintainException()
         else:
-            return jsonify({"user": "created"}), 200
+            return user
+
+    @sql_error_handler
+    def change_password(self, user: User, password: str):
+        """Смена пароля пользователя в БД"""
+        user.password = password
+        db.session.add(user)
+        db.session.commit()
 
     @sql_error_handler
     def get_all(self):
