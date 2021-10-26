@@ -4,7 +4,7 @@ from .validation.validator import Validator
 from .validation.schema import JWTResponseSchema
 
 
-def test_refresh_process(make_refresh_token, make_refresh_request):
+def test_refresh_process(test_db, make_refresh_token, make_refresh_request):
     """Проверяем процесс получения новой пары токенов(access и refresh) взамен одного refresh tokena"""
     rv = make_refresh_request(make_refresh_token)
 
@@ -12,7 +12,7 @@ def test_refresh_process(make_refresh_token, make_refresh_request):
     assert Validator.validate_response(rv, JWTResponseSchema)
 
 
-def test_refresh_process_only_one(make_refresh_token, make_refresh_request):
+def test_refresh_process_only_one(test_db, make_refresh_token, make_refresh_request):
     """Проверяем что по одному и тому же refresh токену нельзя получить access повторно"""
     refresh_token = make_refresh_token
     make_refresh_request(refresh_token)

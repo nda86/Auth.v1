@@ -52,6 +52,9 @@ def create_app(test_config: t.Optional[object] = None) -> Flask:
     from .api.v1 import create_api
     create_api(app)  # регистрируем blueprint для API v1
 
+    from .commands import init_commands
+    init_commands(app)  # инициализируем свои команды
+
     from .exceptions import init_error_handler
     init_error_handler(app)  # подключаем обработчики ошибок
 

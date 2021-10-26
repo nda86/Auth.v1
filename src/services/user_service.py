@@ -84,4 +84,10 @@ class UserService:
     @sql_error_handler
     def get_by_id(self, value):
         """Поиск пользователя по `id`"""
-        return self.model.query.filter_by(id=value).first()
+        return self.model.query.filter_by(id=str(value)).first()
+
+    @sql_error_handler
+    def get_user_roles(self, user_id: str):
+        """Поиск пользователя по `id`"""
+        user = self.model.query.filter_by(id=user_id).first()
+        return user.get_roles() if user else []

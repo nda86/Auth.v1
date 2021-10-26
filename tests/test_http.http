@@ -1,39 +1,31 @@
-GET http://localhost:5000/api/v1/auth/me
-Accept: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNjM1MTg4NzczLCJqdGkiOiIzNGE1MTBiNC1mNzZkLTRlOWUtOGU1OS1kYWM2M2M0OTNmOGYiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiOTUyYmNjNWQtOTY1NC00YzdiLWFmZTctYWFjNDU5ZGVkMTliIiwibmJmIjoxNjM1MTg4NzczLCJleHAiOjE2MzUxODk2NzMsInJ0IjoiZTg3Y2NmNjctN2FiYy00ZWMwLThhMzQtYTZiYmI2ZjMxMDAxIn0.md8QD_1eU8VuCoLB9FT9wrLIJ6YtkrVAkF5EHMZqIQw
+# Регистрация пользователя
+POST http://localhost:5000/api/v1/auth/sign-up
+Content-Type: application/json
+
+{"username":  "user", "password":  "11111111"}
 
 ###
-GET http://localhost:5000/auth/login_history
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNjM1MTgxOTg5LCJqdGkiOiJiZDhlMjlmMi03M2ViLTQxYzgtYWZmOC1jMWE0M2FiYTBjMGIiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiOTUyYmNjNWQtOTY1NC00YzdiLWFmZTctYWFjNDU5ZGVkMTliIiwibmJmIjoxNjM1MTgxOTg5LCJleHAiOjE2MzUxODI4ODksInJ0IjoiMGZmZDE3MzEtNDVjOC00NWRjLWFiYjctNjU5M2U2MTQyYmMwIn0.BzsUXQUVn_NlS1UZgxjfVqmWEfDgKUEJ-OOGC_1oTts
-###
-POST http://localhost:5000/auth/logout
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNjM1MTU2NjkxLCJqdGkiOiI4M2Q3MjU1MC0yNzY0LTQ4MTgtOGYyMy0wN2EwMWU3MmMxMjUiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiNmU4ZjM5ZGYtYzUxOC00NDEzLTllZGEtYWE4YzRhZGRhYmQxIiwibmJmIjoxNjM1MTU2NjkxLCJleHAiOjE2MzUxNTc1OTEsInJ0IjoiMGM5MjU3ODktYjY0NC00NmI4LWJkMjUtMjgwYjc5NDcxYjg0In0.7njI83jBpGzU7xyZRQW6WICxJe6dO7YuGQTRv0_ZNdA
-###
-GET http://localhost:5000/auth/test
 
-###
-POST http://localhost:5000/auth/refresh
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTYzNTEwMTgwMSwianRpIjoiYTgyYWFhZWYtNmUwMC00ZWU0LWJmYWYtMzMzODE3MDA1NjEyIiwidHlwZSI6InJlZnJlc2giLCJzdWIiOiI2ZThmMzlkZi1jNTE4LTQ0MTMtOWVkYS1hYThjNGFkZGFiZDEiLCJuYmYiOjE2MzUxMDE4MDEsImV4cCI6MTYzNzY5MzgwMX0.CMncYLz6V62s6aTzbdPjaUNaGexKgHfzl00ZEuHA2ZM
-###
+# вход пользователя
 POST http://localhost:5000/api/v1/auth/sign-in
 Content-Type: application/json
-User-Agent: Drevokol 5000
 
-
-{
-  "username": "flask",
-  "password": "flask1111111111"
-}
+{"username":  "user", "password":  "11111111"}
 
 ###
-POST http://localhost:5000/auth/sign-up
+
+# добавление роли пользователю
+POST http://localhost:5000/api/v1/roles/assign
 Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNjM1MzE5OTUxLCJqdGkiOiI2YTQxNzQ4My04OGYxLTQ1NWQtOTFkYy0xNGRmNzY3MmE4YjYiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiZWI0NzBjOTItY2I2OS00NjUxLWFkOGQtOWRhNjQ2NmIwOTg5IiwibmJmIjoxNjM1MzE5OTUxLCJleHAiOjE2MzUzMjA4NTEsInJ0IjoiZjEyMzhiODMtYjIzZS00MDM1LTk0MjQtYTM3Njg1OTdlMjg4IiwidXIiOlsiQWRtaW4iXX0.jHzfBt6TD_4GsmGPL5gtv4jF5bpUM-noNmL3qy_-f4c
 
-{"username":  "flask", "password": "flask1111111111", "email":  "lol@cokm11111.ru"}
-
-###
-GET http://localhost:5000/ping
-Accept: application/json
+{"user_id":  "4c14a10c-21d4-4878-a6a9-9f1bd6735f53", "role_name":  "bargur"}
 
 ###
 
+# создание роли
+POST http://localhost:5000/api/v1/roles
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNjM1MzE5OTUxLCJqdGkiOiI2YTQxNzQ4My04OGYxLTQ1NWQtOTFkYy0xNGRmNzY3MmE4YjYiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiZWI0NzBjOTItY2I2OS00NjUxLWFkOGQtOWRhNjQ2NmIwOTg5IiwibmJmIjoxNjM1MzE5OTUxLCJleHAiOjE2MzUzMjA4NTEsInJ0IjoiZjEyMzhiODMtYjIzZS00MDM1LTk0MjQtYTM3Njg1OTdlMjg4IiwidXIiOlsiQWRtaW4iXX0.jHzfBt6TD_4GsmGPL5gtv4jF5bpUM-noNmL3qy_-f4c
+
+{"name":  "bargur"}

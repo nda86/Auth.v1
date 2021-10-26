@@ -7,6 +7,7 @@ from flask_jwt_extended import jwt_required
 
 from src.schemas.user_schema import SignUpSchema, SignInSchema, UpdatePasswordSchema
 from src.services import AuthService
+from src.utils import RequestValidator
 
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
@@ -20,7 +21,7 @@ def test_route():
 
 
 @auth_bp.route("/sign-up", methods=["POST"])
-@AuthService.validate_request(SignUpSchema)
+@RequestValidator.validate_body(SignUpSchema)
 def sign_up(data, auth_service: AuthService) -> Response:
     """Запрос на регистрацию пользователя
     data это словарь данных возвращаемым декоратором @validate_request.
@@ -31,27 +32,27 @@ def sign_up(data, auth_service: AuthService) -> Response:
 
 
 @auth_bp.route("/sign-in", methods=["POST"])
-@AuthService.validate_request(schema=SignInSchema)
+@RequestValidator.validate_body(schema=SignInSchema)
 def sign_in(data, auth_service: AuthService) -> Response:
     """Запрос на вход пользователя в систему"""
     return auth_service.sign_in(data)
 
 
-@auth_bp.route("/refresh", methods=["POST"])
+@auth_bp.route("/refresh", methods=["GET"])
 @jwt_required(refresh=True)
 def refresh(auth_service: AuthService) -> Response:
     """Запрос на обновление access токена"""
     return auth_service.refresh_jwt()
 
 
-@auth_bp.route("/logout", methods=["POST"])
+@auth_bp.route("/logout", methods=["GET"])
 @jwt_required()
 def logout(auth_service: AuthService) -> Response:
     """Запрос на выход из аккаунта на текущем устройстве"""
     return auth_service.logout()
 
 
-@auth_bp.route("/logout_all", methods=["POST"])
+@auth_bp.route("/logout_all", methods=["GET"])
 @jwt_required()
 def logout_all(auth_service: AuthService) -> Response:
     """Запрос на выход из аккаунта со всех устройств"""
@@ -74,7 +75,7 @@ def me(auth_service: AuthService) -> Response:
 
 @auth_bp.route("/change_password", methods=["POST"])
 @jwt_required(fresh=True)
-@AuthService.validate_request(schema=UpdatePasswordSchema)
+@RequestValidator.validate_body(schema=UpdatePasswordSchema)
 def change_password(data, auth_service: AuthService) -> Response:
     """Запрос пользовательского профиля.
     Смена пароля это важная операция, поэтому о первых для неё сделаем отдельный endpoint и обработчики,
@@ -83,3 +84,10 @@ def change_password(data, auth_service: AuthService) -> Response:
     залогиниться, если он давно этого не делал.
     """
     return auth_service.change_password(data)
+
+
+@auth_bp.route("/authorize", methods=["GET"])
+@jwt_required()
+def authorize(auth_service: AuthService) -> Response:
+    """Запрос на авторизацию"""
+    return auth_service.authorize()

@@ -25,3 +25,33 @@ class SignInSchema(ma.Schema):
 class UpdatePasswordSchema(ma.Schema):
     """Схема для валидации входящих данных при смене пароля"""
     password = fields.String(required=True, load_only=True, validate=[validate.Length(min=8, max=20)])
+
+
+class CreateRoleSchema(ma.Schema):
+    """Схема для валидации входящих данных при создании роли"""
+    name = fields.String(required=True)
+    description = fields.Str(required=False)
+
+
+class DeleteRoleSchema(ma.Schema):
+    """Схема для валидации входящих данных при создании роли"""
+    role_id = fields.UUID(required=True)
+
+
+class UpdateRoleSchema(ma.Schema):
+    """Схема для валидации входящих данных при создании роли"""
+    id = fields.UUID(required=True)
+    name = fields.String(required=True)
+    description = fields.Str(required=False)
+
+
+class AssignRoleSchema(ma.Schema):
+    """Схема для валидации входящих данных при добавлении роли пользователю"""
+    role_name = fields.String(required=True)
+    user_id = fields.UUID(required=True)
+
+
+class UnassignRoleSchema(ma.Schema):
+    """Схема для валидации входящих данных при удалении роли у пользователя"""
+    role_name = fields.String(required=True)
+    user_id = fields.UUID(required=True)
