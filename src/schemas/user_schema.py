@@ -4,7 +4,7 @@
 
 from marshmallow import fields, validate
 
-from src import ma
+from core import ma
 
 
 class SignUpSchema(ma.Schema):

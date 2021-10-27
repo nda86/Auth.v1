@@ -3,8 +3,8 @@ import typing as t
 from flask_jwt_extended import create_access_token, create_refresh_token, current_user, get_jwt, get_jti
 from injector import inject
 
-from src.storage import JWTStorage
-from src.models import User
+from storage import JWTStorage
+from models import User
 
 
 class JWTService:

@@ -4,10 +4,10 @@ import sqlalchemy.exc
 from flask import Response, jsonify, abort
 from injector import inject
 
-from src.exceptions import DBMaintainException
-from src.core.logger import auth_logger
-from src import db
-from src.models import Role, RoleSchema
+from exceptions import DBMaintainException
+from core.logger import auth_logger
+from core import db
+from models import Role, RoleSchema
 from .user_service import UserService
 from .jwt_service import JWTService
 

@@ -13,8 +13,8 @@ from redis.exceptions import RedisError
 from flask_jwt_extended import get_jti, decode_token
 
 from .jwt_storage import JWTStorage
-from src.core.logger import auth_logger
-from src.exceptions import DBMaintainException
+from core.logger import auth_logger
+from exceptions import DBMaintainException
 
 
 def redis_error_wrapper(f):

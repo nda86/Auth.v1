@@ -13,9 +13,11 @@ from werkzeug.test import TestResponse
 
 from .config import settings
 
-sys.path.append(str(Path(__file__).parent.parent))
-from src import create_app, db  # noqa
-from src.models import User, Role  # noqa
+a = str(Path(Path(__file__).parent.parent, "src"))
+sys.path.append(a)
+print(a)
+from core import create_app, db  # noqa
+from models import User, Role  # noqa
 
 
 @dataclass
