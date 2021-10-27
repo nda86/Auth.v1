@@ -1,7 +1,7 @@
 from functools import wraps
 
 from flask import request
-from marshmallow import ValidationError, EXCLUDE
+from marshmallow import EXCLUDE, ValidationError
 
 from core.logger import auth_logger
 from exceptions import ApiValidationException

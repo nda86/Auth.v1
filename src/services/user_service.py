@@ -3,9 +3,9 @@ from functools import wraps
 import sqlalchemy.exc
 
 from core import db
-from models import User, UserSchema
-from exceptions import DBMaintainException
 from core.logger import auth_logger
+from exceptions import DBMaintainException
+from models import User, UserSchema
 
 
 def sql_error_handler(f):

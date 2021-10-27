@@ -1,11 +1,11 @@
 import typing as t
 
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_marshmallow import Marshmallow
 from flask_injector import FlaskInjector
 from flask_jwt_extended import JWTManager
+from flask_marshmallow import Marshmallow
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 
 from .config import settings
 from .logger import init_log_config
@@ -57,6 +57,9 @@ def create_app(test_config: t.Optional[object] = None) -> Flask:
 
     from exceptions import init_error_handler
     init_error_handler(app)  # подключаем обработчики ошибок
+
+    from swagger import init_swagger_ui
+    init_swagger_ui(app)  # подключаем swagger
 
     @app.route("/ping")
     def hello():

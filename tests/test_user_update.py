@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
-from .validation.validator import Validator
 from .validation.schema import JWTResponseSchema
+from .validation.validator import Validator
 
 
 def test_change_password(test_db, create_user, make_flask_request, login_user):

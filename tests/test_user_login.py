@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
-from .validation.validator import Validator
 from .validation.schema import JWTResponseSchema
+from .validation.validator import Validator
 
 
 def test_wrong_username(test_db, create_user, login_user):

@@ -13,5 +13,9 @@ class Settings(BaseSettings):
     JWT_REFRESH_TOKEN_EXPIRES: int = Field(30 * 24 * 60 * 60, env="JWT_REFRESH_TOKEN_EXPIRES")  # 30 дней
     JWT_ACCESS_TOKEN_EXPIRES: int = Field(15 * 60, env="JWT_ACCESS_TOKEN_EXPIRES")   # 15 минут
 
+    # swagger
+    SWAGGER_URL: str = Field("/api/docs", env="SWAGGER_URL")
+    SWAGGER_JSON_URL: str = Field("http://127.0.0.1:5000/openapi/swagger.json", env="URL_SWAGGER_JSON")
+
 
 settings = Settings()

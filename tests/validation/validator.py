@@ -1,8 +1,8 @@
 import typing as t
 
-from werkzeug.test import Response
 from pydantic import BaseModel
 from pydantic.errors import PydanticValueError
+from werkzeug.test import Response
 
 
 class Validator:

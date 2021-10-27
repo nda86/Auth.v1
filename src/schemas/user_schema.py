@@ -55,3 +55,30 @@ class UnassignRoleSchema(ma.Schema):
     """Схема для валидации входящих данных при удалении роли у пользователя"""
     role_name = fields.String(required=True)
     user_id = fields.UUID(required=True)
+
+
+class SimpleResponseSchema(ma.Schema):
+    """Схема простого ответа"""
+    message = fields.String(required=True)
+
+
+class RoleResponseSchema(ma.Schema):
+    """Схема ответа создания/обновления роли"""
+    id = fields.UUID(required=True)
+    name = fields.String(required=True)
+    description = fields.String(required=True)
+
+
+class UserResponseSchema(ma.Schema):
+    """Схема ответа создания/обновления пользователя"""
+    id = fields.UUID()
+    username = fields.String()
+    email = fields.Email()
+    first_name = fields.String()
+    last_name = fields.String()
+
+
+class JWTResponseSchema(ma.Schema):
+    """Схема ответа создания/рефреша токенов"""
+    access_token = fields.String()
+    refresh_token = fields.String()

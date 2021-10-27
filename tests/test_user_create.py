@@ -2,10 +2,9 @@ from http import HTTPStatus
 
 import pytest
 
-from .test_data.validations import (
-    VALID_USER,
-    check_password_validation, check_username_validation, check_email_validation,
-)
+from .test_data.validations import (VALID_USER, check_email_validation,
+                                    check_password_validation,
+                                    check_username_validation)
 
 
 @pytest.mark.parametrize("test_data, expected_response, expected_code", check_password_validation)

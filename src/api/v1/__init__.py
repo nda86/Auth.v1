@@ -1,4 +1,4 @@
-from flask import Flask, Blueprint
+from flask import Blueprint, Flask
 
 
 def create_api(app: Flask) -> None:
