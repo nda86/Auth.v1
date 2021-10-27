@@ -5,13 +5,13 @@
 from flask import Blueprint, Response
 from flask_jwt_extended import jwt_required
 
-from src.schemas.user_schema import (
+from schemas import (
     CreateRoleSchema, DeleteRoleSchema,
     UpdateRoleSchema, AssignRoleSchema,
     UnassignRoleSchema
 )
-from src.services import RoleService
-from src.utils import RequestValidator, admin_required
+from services import RoleService
+from utils import RequestValidator, admin_required
 
 
 role_bp = Blueprint("role", __name__, url_prefix="/roles")

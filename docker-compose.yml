@@ -1,0 +1,51 @@
+version: '3.5'
+
+services:
+
+  redis:
+    image: redis:6-alpine
+    container_name: redis
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    volumes:
+      - redis_data:/data
+    networks:
+      - auth_net
+    restart: always
+
+  db:
+    image: postgres:13.3
+    container_name: db
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth_db
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - auth_net
+    restart: always
+
+  auth:
+    container_name: auth
+    build: .
+    image: auth-image
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - ./.env
+    environment:
+      WAIT_HOSTS: db:5432, redis:6379
+    networks:
+      - auth_net
+    restart: always
+
+volumes:
+  pg_data:
+  redis_data:
+
+networks:
+  auth_net:
+    name: auth_net

@@ -3,8 +3,8 @@ import getpass
 
 from flask import Flask
 
-from src import db
-from src.models import Role, User
+from core import db
+from models import Role, User
 
 
 def init_commands(app: Flask):

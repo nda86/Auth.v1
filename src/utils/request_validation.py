@@ -3,8 +3,8 @@ from functools import wraps
 from flask import request
 from marshmallow import ValidationError, EXCLUDE
 
-from src.core.logger import auth_logger
-from src.exceptions import ApiValidationException
+from core.logger import auth_logger
+from exceptions import ApiValidationException
 
 
 class RequestValidator:

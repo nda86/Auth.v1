@@ -1,7 +1,7 @@
 import datetime
 import uuid
 
-from src import db
+from core import db
 
 
 class UUIDMixin:

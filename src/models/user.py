@@ -3,9 +3,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from marshmallow import EXCLUDE, validates
 
 from .common import UUIDMixin, TimeStampedMixin
-from src import db, ma
-from src.exceptions import DBValidationException
-from src.core.logger import auth_logger
+from core import db, ma
+from exceptions import DBValidationException
+from core.logger import auth_logger
 
 # таблица для many-to-many связи между User и Role
 user_role = db.Table(

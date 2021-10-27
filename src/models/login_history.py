@@ -1,6 +1,6 @@
 import datetime
 
-from src import db
+from core import db
 
 from .common import UUIDMixin
 

@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     SQLALCHEMY_DATABASE_URI: str = Field("sqlite:///auth.db", env="SQLALCHEMY_DATABASE_URI")
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = True
     SQLALCHEMY_ECHO: bool = True
-    AUTH_URL: str = Field("http://127.0.0.1:5000", env="AUTH_URL")
+    DEBUG: bool = Field(False, env="DEBUG")
 
     # JWT
     JWT_REDIS_URL: str = Field("redis://127.0.0.1:6379/3", env="JWT_REDIS_URL", description="Редис для хранения jwt")

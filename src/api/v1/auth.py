@@ -5,9 +5,9 @@
 from flask import Blueprint, jsonify, Response
 from flask_jwt_extended import jwt_required
 
-from src.schemas.user_schema import SignUpSchema, SignInSchema, UpdatePasswordSchema
-from src.services import AuthService
-from src.utils import RequestValidator
+from schemas import SignUpSchema, SignInSchema, UpdatePasswordSchema
+from services import AuthService
+from utils import RequestValidator
 
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")

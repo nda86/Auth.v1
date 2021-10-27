@@ -2,10 +2,10 @@ from functools import wraps
 
 import sqlalchemy.exc
 
-from src import db
-from src.models.user import User, UserSchema
-from src.exceptions import DBMaintainException
-from src.core.logger import auth_logger
+from core import db
+from models import User, UserSchema
+from exceptions import DBMaintainException
+from core.logger import auth_logger
 
 
 def sql_error_handler(f):

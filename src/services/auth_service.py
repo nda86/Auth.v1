@@ -4,10 +4,10 @@ from flask import request, Response, jsonify, abort
 from sqlalchemy.exc import SQLAlchemyError
 from injector import inject
 
-from src.exceptions import WrongCredentials, RefreshTokenInvalid, DBMaintainException
-from src.core.logger import auth_logger
-from src import db
-from src.models import LoginHistory, User
+from exceptions import WrongCredentials, RefreshTokenInvalid, DBMaintainException
+from core.logger import auth_logger
+from core import db
+from models import LoginHistory, User
 from .user_service import UserService
 from .jwt_service import JWTService
 
