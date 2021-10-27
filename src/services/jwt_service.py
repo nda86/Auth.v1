@@ -4,6 +4,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token, curren
 from injector import inject
 
 from src.storage import JWTStorage
+from src.models import User
 
 
 class JWTService:
@@ -15,12 +16,14 @@ class JWTService:
     def __init__(self, storage: JWTStorage):
         self.storage = storage
 
-    def gen_tokens(self, user: object, fresh: bool = False) -> tuple[str, str]:
+    def gen_tokens(self, user: User, fresh: bool = False) -> tuple[str, str]:
         """Формируем пару токенов.
-        Дополнительно в access токен кладем jti refresh токена, чтобы в будущем знать с каким рефреш токеном связан
-        определённый access токен"""
+        Дополнительный claims
+         - `rt` - jti refresh токена, чтобы в будущем знать с каким рефреш токеном связан
+        определённый access токен
+         - `ur` - список ролей пользователя, необходимо для авторизации"""
         refresh_token = self._gen_refresh_token(user)
-        access_claims = {"rt": get_jti(refresh_token)}
+        access_claims = {"rt": get_jti(refresh_token), "ur": user.get_roles()}
         access_token = self._gen_access_token(user, fresh, access_claims)
         return access_token, refresh_token
 
@@ -64,3 +67,8 @@ class JWTService:
     def get_claim_from_token(claim: str) -> str:
         """Метод возвращает значение claim из токена полученного из запроса"""
         return get_jwt().get(claim)
+
+    @staticmethod
+    def get_current_user() -> User:
+        """Возвращает пользователя из access токена"""
+        return current_user

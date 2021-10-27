@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
 
-def test_success_logout(make_refresh_token, make_refresh_request, logout_user):
+def test_success_logout(test_db, make_refresh_token, make_refresh_request, logout_user):
     """Проверка ответа при успешном выходе с текущего устройтва, "выход с этого устройства".
     Успешный выход означает невозможность получить новый access токен по рефреш токену
     Последовательность теста:

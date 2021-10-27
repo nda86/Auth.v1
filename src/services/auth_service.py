@@ -1,12 +1,10 @@
-import functools
 import typing as t
 
 from flask import request, Response, jsonify, abort
-from marshmallow import ValidationError, EXCLUDE
 from sqlalchemy.exc import SQLAlchemyError
 from injector import inject
 
-from src.exceptions import ApiValidationException, WrongCredentials, RefreshTokenInvalid, DBMaintainException
+from src.exceptions import WrongCredentials, RefreshTokenInvalid, DBMaintainException
 from src.core.logger import auth_logger
 from src import db
 from src.models import LoginHistory, User
@@ -25,32 +23,6 @@ class AuthService:
     def __init__(self, user_service: UserService, token_service: JWTService):
         self.user_service = user_service
         self.token_service = token_service
-
-    @classmethod
-    def validate_request(cls, schema):
-        """Метод возвращает декоратор для валидации входящего запроса
-        :type schema: модель-схема описывает формат валидных входящих данных
-        """
-
-        def decorator(f):
-            @functools.wraps(f)
-            def decorated_function(*args, **kwargs):
-                try:
-                    if request.json:
-                        data = schema().load(request.json, unknown=EXCLUDE)
-                    elif request.form:
-                        data = schema().load(request.form, unknown=EXCLUDE)
-                    else:
-                        auth_logger.error("В запросе нет данных")
-                        raise ApiValidationException("Data not found")
-                except ValidationError as err:
-                    auth_logger.error(f"Ошибка валидации запроса {err.messages}")
-                    raise ApiValidationException(err.messages)
-                return f(*args, data=data, **kwargs)
-
-            return decorated_function
-
-        return decorator
 
     @staticmethod
     def _make_response(data: t.Union[dict, str, list]) -> Response:
@@ -100,9 +72,9 @@ class AuthService:
         """
         user = self.user_service.create_user(data)
         if user:
-            return self._make_response({f"user:{user.id}": "created"})
+            return self._make_response(user.dict())
         else:
-            return self._make_response({f"user:{user.id}": "not created"})
+            return self._make_response("Error create user")
 
     def refresh_jwt(self) -> Response:
         """Метод выполняет процедуру refresh jwt.
@@ -170,3 +142,11 @@ class AuthService:
         self.user_service.change_password(user=user, password=data["password"])
         auth_logger.debug(f"Пароль для пользователя {user.id} изменён")
         return self._make_response("Password successfully changed")
+
+    def authorize(self) -> Response:
+        """Метод выполняет авторизацию пользователя
+        Пока что просто возвращаем список ролей пользователя
+        """
+        user_id = self.token_service.get_claim_from_token("sub")
+        roles = self.user_service.get_user_roles(user_id)
+        return self._make_response(roles)

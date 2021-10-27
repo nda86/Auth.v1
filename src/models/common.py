@@ -5,9 +5,14 @@ from src import db
 
 
 class UUIDMixin:
-    """Миксин для добавления в модели первичного ключа в формате UUID"""
+    """Миксин для добавления в модели первичного ключа в формате UUID
+    Здесь сами эмулируем UUID, а не используем тип UUID из sqlalchemy.dialects.postgresql потому что он
+    работает только в pg, а хотелось бы еще поддержку других бд.
+    """
 
-    id = db.Column(db.Text(length=36), primary_key=True, default=lambda: str(uuid.uuid4()), unique=True, nullable=False)
+    id = db.Column(
+        db.String(length=36), primary_key=True, default=lambda: str(uuid.uuid4()), unique=True, nullable=False
+    )
 
 
 class TimeStampedMixin:
