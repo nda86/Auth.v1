@@ -1,15 +1,17 @@
 import typing as t
 
-from flask import request, Response, jsonify, abort
-from sqlalchemy.exc import SQLAlchemyError
+from flask import Response, abort, jsonify, request
 from injector import inject
+from sqlalchemy.exc import SQLAlchemyError
 
-from exceptions import WrongCredentials, RefreshTokenInvalid, DBMaintainException
-from core.logger import auth_logger
 from core import db
+from core.logger import auth_logger
+from exceptions import (DBMaintainException, RefreshTokenInvalid,
+                        WrongCredentials)
 from models import LoginHistory, User
-from .user_service import UserService
+
 from .jwt_service import JWTService
+from .user_service import UserService
 
 
 class AuthService:

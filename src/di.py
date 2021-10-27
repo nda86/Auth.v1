@@ -1,10 +1,10 @@
-from injector import Module, Binder, singleton
-from flask_injector import request
 import redis
+from flask_injector import request
+from injector import Binder, Module, singleton
 
-from services import UserService, AuthService, JWTService, RoleService
-from storage import JWTStorage, JWTRedisStorage
 from core.config import settings
+from services import AuthService, JWTService, RoleService, UserService
+from storage import JWTRedisStorage, JWTStorage
 
 
 class ServiceInjector(Module):

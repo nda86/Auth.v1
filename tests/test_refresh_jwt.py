@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
-from .validation.validator import Validator
 from .validation.schema import JWTResponseSchema
+from .validation.validator import Validator
 
 
 def test_refresh_process(test_db, make_refresh_token, make_refresh_request):

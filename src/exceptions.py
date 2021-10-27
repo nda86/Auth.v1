@@ -4,8 +4,8 @@
 Сейчас просто просто прописываем свои атрибуты, к которым можем обращаться в обработчиках исключений.
 """
 
-import typing as t
 import json
+import typing as t
 
 from flask import Flask
 from werkzeug.exceptions import HTTPException

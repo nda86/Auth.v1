@@ -1,15 +1,16 @@
 import typing as t
 
 import sqlalchemy.exc
-from flask import Response, jsonify, abort
+from flask import Response, abort, jsonify
 from injector import inject
 
-from exceptions import DBMaintainException
-from core.logger import auth_logger
 from core import db
+from core.logger import auth_logger
+from exceptions import DBMaintainException
 from models import Role, RoleSchema
-from .user_service import UserService
+
 from .jwt_service import JWTService
+from .user_service import UserService
 
 
 class RoleService:

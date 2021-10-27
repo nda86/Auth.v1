@@ -1,8 +1,8 @@
 import sys
-from pathlib import Path
-from dataclasses import dataclass
 import typing as t
+from dataclasses import dataclass
 from functools import partial
+from pathlib import Path
 
 import pytest
 import requests
@@ -13,11 +13,9 @@ from werkzeug.test import TestResponse
 
 from .config import settings
 
-a = str(Path(Path(__file__).parent.parent, "src"))
-sys.path.append(a)
-print(a)
+sys.path.append(str(Path(Path(__file__).parent.parent, "src")))
 from core import create_app, db  # noqa
-from models import User, Role  # noqa
+from models import Role, User  # noqa
 
 
 @dataclass

@@ -8,13 +8,14 @@
 import datetime
 from functools import wraps
 
+from flask_jwt_extended import decode_token, get_jti
 from redis import Redis
 from redis.exceptions import RedisError
-from flask_jwt_extended import get_jti, decode_token
 
-from .jwt_storage import JWTStorage
 from core.logger import auth_logger
 from exceptions import DBMaintainException
+
+from .jwt_storage import JWTStorage
 
 
 def redis_error_wrapper(f):

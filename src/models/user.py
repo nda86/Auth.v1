@@ -1,11 +1,12 @@
 from flask import current_app
-from werkzeug.security import generate_password_hash, check_password_hash
 from marshmallow import EXCLUDE, validates
+from werkzeug.security import check_password_hash, generate_password_hash
 
-from .common import UUIDMixin, TimeStampedMixin
 from core import db, ma
-from exceptions import DBValidationException
 from core.logger import auth_logger
+from exceptions import DBValidationException
+
+from .common import TimeStampedMixin, UUIDMixin
 
 # таблица для many-to-many связи между User и Role
 user_role = db.Table(

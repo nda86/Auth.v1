@@ -12,6 +12,6 @@ def admin_required(f):
     @wraps(f)
     def inner(*args, **kwargs):
         if not current_user.has_role("Admin"):
-            return abort(401, description="access only for admin")
+            return abort(403, description="access only for admin")
         return f(*args, **kwargs)
     return inner
