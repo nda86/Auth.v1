@@ -1,4 +1,5 @@
 import typing as t
+from http import HTTPStatus
 
 import sqlalchemy.exc
 from flask import Response, abort, jsonify
@@ -9,6 +10,7 @@ from core.logger import auth_logger
 from exceptions import DBMaintainException
 from models import Role, RoleSchema
 
+import const_messages
 from .jwt_service import JWTService
 from .user_service import UserService
 
@@ -64,7 +66,7 @@ class RoleService:
             auth_logger.error(f"Неожиданная ошибка в бд при сохранение роли пользователя {role}\n{str(e)}")
             raise DBMaintainException()
         else:
-            return self._make_response(f"Role {role} successfully deleted")
+            return self._make_response(const_messages.ROLE_DELETED.format(role=role.name))
 
     def list_roles(self) -> Response:
         """Метод возвращает список ролей в бд
@@ -105,7 +107,7 @@ class RoleService:
             auth_logger.error(f"Неожиданная ошибка в бд при добавлении роли\n{str(e)}")
             raise DBMaintainException()
         else:
-            return self._make_response("Role successfully assign")
+            return self._make_response(const_messages.ROLE_ASSIGNED.format(role=role.name, user=user.username))
 
     def unassign_role(self, data: dict) -> Response:
         """Метод убирает роль у пользователя в бд
@@ -120,14 +122,14 @@ class RoleService:
             auth_logger.error(f"Неожиданная ошибка в бд при удалении роли у пользователя\n{str(e)}")
             raise DBMaintainException()
         else:
-            return self._make_response("Role successfully unassign")
+            return self._make_response(const_messages.ROLE_UNASSIGNED.format(role=role.name, user=user.username))
 
     def _get_role(self, data):
         """Получаем объекты роли"""
         role = self.model.query.filter_by(name=data.get("role_name")).first()
         if not role:
             auth_logger.debug(f"При удалении роли у пользователя. Роль {data.get('role_name')} не найдена")
-            abort(404, description=f"Роль {data.get('role_name')} не найдена")
+            abort(HTTPStatus.NOT_FOUND, description=const_messages.ROLE_NOT_FOUND.format(role=data.get("role_name")))
         return role
 
     def _get_user(self, data):
@@ -135,5 +137,5 @@ class RoleService:
         user = self.user_service.get_by_id(data.get("user_id"))
         if not user:
             auth_logger.debug(f"При удалении роли у пользователя. Пользователь с {data.get('user_id')} не найден")
-            abort(404, description=f"Пользователь с {data.get('user_id')} не найден")
+            abort(HTTPStatus.NOT_FOUND, description=const_messages.USER_NOT_FOUND.format(user=data.get("user_id")))
         return user

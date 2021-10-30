@@ -1,10 +1,12 @@
 """
 Обрабатывает входящие запросы на /auth/*
 """
+from http import HTTPStatus
 
 from flask import Blueprint, Response, jsonify
 from flask_jwt_extended import jwt_required
 
+from core import limiter
 from schemas import SignInSchema, SignUpSchema, UpdatePasswordSchema
 from services import AuthService
 from utils import RequestValidator
@@ -48,6 +50,10 @@ def sign_up(data, auth_service: AuthService) -> Response:
 
 
 @auth_bp.route("/sign-in", methods=["POST"])
+# дополнительно устанавливаем лимит запросов на это роут, чтобы еще больше повысить секурность в целом
+# 5 запросов в минуту при условии что введены неправильные логин и пароль
+# для всех остальных роутов применены глобальные настройки limeter'a
+@limiter.limit("5/minute", deduct_when=lambda r: r.status_code == HTTPStatus.UNAUTHORIZED)
 @RequestValidator.validate_body(schema=SignInSchema)
 def sign_in(data, auth_service: AuthService) -> Response:
     """Запрос на вход пользователя в систему
@@ -64,8 +70,8 @@ def sign_in(data, auth_service: AuthService) -> Response:
           content:
             application/json:
               schema: JWTResponseSchema
-        400:
-          description: Некорректный запрос
+        401:
+          description: Необходима авторизация
       tags:
         - Аккаунты пользователей
     """
