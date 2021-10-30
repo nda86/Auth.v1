@@ -1,4 +1,5 @@
 import typing as t
+from http import HTTPStatus
 
 from flask import Response, abort, jsonify, request
 from injector import inject
@@ -10,6 +11,7 @@ from exceptions import (DBMaintainException, RefreshTokenInvalid,
                         WrongCredentials)
 from models import LoginHistory, User
 
+import const_messages
 from .jwt_service import JWTService
 from .user_service import UserService
 
@@ -63,7 +65,7 @@ class AuthService:
         user = self.user_service.get_by_username(data["username"])
         if not user or not user.verify_password(data["password"]):
             auth_logger.debug("Попытка входа с неверными учётными данными")
-            raise WrongCredentials("Wrong username or password")
+            raise WrongCredentials(const_messages.EXC_WRONG_CREDENTIALS)
         self._add_login_history(user)
         access_token, refresh_token = self._make_tokens(user, fresh=True)
         return self._make_response(dict(access_token=access_token, refresh_token=refresh_token))
@@ -76,7 +78,7 @@ class AuthService:
         if user:
             return self._make_response(user.dict())
         else:
-            return self._make_response("Error create user")
+            return self._make_response(const_messages.ERR_CREATE_USER)
 
     def refresh_jwt(self) -> Response:
         """Метод выполняет процедуру refresh jwt.
@@ -90,7 +92,7 @@ class AuthService:
         else:
             auth_logger.debug("Попытка получить новый access token по несуществующему refresh токену")
             raise RefreshTokenInvalid(
-                "Refresh token not found or was stolen. Please make sign-in and logout all other devices"
+                const_messages.EXC_REFRESH_TOKEN_INVALID
             )
 
     def logout(self) -> Response:
@@ -129,7 +131,7 @@ class AuthService:
         user_id = self.token_service.get_claim_from_token("sub")  # получаем id текущего пользователя
         user = self.user_service.get_by_id(user_id)
         if not user:
-            abort(404, description="Пользователь не найден")
+            abort(HTTPStatus.NOT_FOUND, description=const_messages.USER_NOT_FOUND.format(user=user_id))
         return self._make_response(user.dict())
 
     def change_password(self, data: dict) -> Response:
@@ -140,10 +142,10 @@ class AuthService:
         user = self.user_service.get_by_id(user_id)
         if not user:
             auth_logger.debug(f"Попытка смены пароля для пользователя не существующего в бд\n{user.id=}")
-            abort(404, description="Пользователь не найден")
+            abort(HTTPStatus.NOT_FOUND, description=const_messages.USER_NOT_FOUND.format(user=user_id))
         self.user_service.change_password(user=user, password=data["password"])
         auth_logger.debug(f"Пароль для пользователя {user.id} изменён")
-        return self._make_response("Password successfully changed")
+        return self._make_response(const_messages.PASSWORD_CHANGED)
 
     def authorize(self) -> Response:
         """Метод выполняет авторизацию пользователя

@@ -2,10 +2,13 @@ import typing as t
 
 from flask import Flask
 from flask_injector import FlaskInjector
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from flask_jwt_extended import JWTManager
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from .config import settings
 from .logger import init_log_config
@@ -14,10 +17,12 @@ db = SQLAlchemy()
 migrate = Migrate()
 ma = Marshmallow()
 jwt = JWTManager()
+limiter = Limiter(key_func=get_remote_address)
 
 
 def create_app(test_config: t.Optional[object] = None) -> Flask:
     app = Flask(__name__)
+    app.wsgi_app = ProxyFix(app=app.wsgi_app, x_for=1, x_proto=1)  # для определения ip клиента за прокси
 
     if test_config is None:
         app.config.from_object(settings)
@@ -60,6 +65,8 @@ def create_app(test_config: t.Optional[object] = None) -> Flask:
 
     from swagger import init_swagger_ui
     init_swagger_ui(app)  # подключаем swagger
+
+    limiter.init_app(app)  # инициализируем limiter
 
     @app.route("/ping")
     def hello():

@@ -22,3 +22,4 @@ psycopg2-binary==2.9.1
 apispec[marshmallow]==5.1.1
 apispec-webframeworks==0.5.2
 flask-swagger-ui==3.36.0
+flask-limiter==1.4

@@ -10,7 +10,7 @@ Content-Type: application/json
 POST http://localhost:5000/api/v1/auth/sign-in
 Content-Type: application/json
 
-{"username":  "user", "password":  "11111111"}
+{"username":  "admin", "password":  "admi"}
 
 ###
 
@@ -24,8 +24,6 @@ Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6dHJ1ZSwia
 ###
 
 # создание роли
-POST http://localhost:5000/api/v1/roles
+GET http://localhost:5000/api/v1/roles
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNjM1MzE5OTUxLCJqdGkiOiI2YTQxNzQ4My04OGYxLTQ1NWQtOTFkYy0xNGRmNzY3MmE4YjYiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiZWI0NzBjOTItY2I2OS00NjUxLWFkOGQtOWRhNjQ2NmIwOTg5IiwibmJmIjoxNjM1MzE5OTUxLCJleHAiOjE2MzUzMjA4NTEsInJ0IjoiZjEyMzhiODMtYjIzZS00MDM1LTk0MjQtYTM3Njg1OTdlMjg4IiwidXIiOlsiQWRtaW4iXX0.jHzfBt6TD_4GsmGPL5gtv4jF5bpUM-noNmL3qy_-f4c
-
-{"name":  "bargur"}
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6dHJ1ZSwiaWF0IjoxNjM1NTgyMDE4LCJqdGkiOiI1Y2VlZDNhYS00MGQyLTRiZmEtYTFjNS0yZDQxNDNhMzVlNjYiLCJ0eXBlIjoiYWNjZXNzIiwic3ViIjoiYTAyY2EzMDktY2VjMC00ZDM4LWE5ZjYtZjgyOGVlNjQ1YjFmIiwibmJmIjoxNjM1NTgyMDE4LCJleHAiOjE2MzU1ODI5MTgsInJ0IjoiMmE0YTZlNjYtYTliNS00NTkzLWI1OTctMGYxYzA3NWIxYTUyIiwidXIiOlsiQWRtaW4iXX0.2XRZ5kVExAZG2RfjoWRcypiTKYi0gn7Jq8rSHp_aM5c

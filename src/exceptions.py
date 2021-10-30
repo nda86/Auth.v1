@@ -6,15 +6,18 @@
 
 import json
 import typing as t
+from http import HTTPStatus
 
 from flask import Flask
 from werkzeug.exceptions import HTTPException
+
+import const_messages
 
 
 class DBValidationException(HTTPException):
     """EXC бросаем его если пользователь при регистрации ввёл
     данные которые не проходят валидацию в бд"""
-    code = 400
+    code = HTTPStatus.BAD_REQUEST
     name = "CONSTRANT: Already exists"
 
     def __init__(self, description: str):
@@ -25,7 +28,7 @@ class DBValidationException(HTTPException):
 class ApiValidationException(HTTPException):
     """EXC бросаем его если пользователь при регистрации ввёл
     данные которые не проходят валидацию в API"""
-    code = 400
+    code = HTTPStatus.BAD_REQUEST
     name = "API Validation error"
 
     def __init__(self, description: str):
@@ -36,17 +39,17 @@ class ApiValidationException(HTTPException):
 class DBMaintainException(HTTPException):
     """EXC бросаем его если при работе с каким то хранилищем postgres, redis и т.д случилась непредвиденная ошибка.
     Клиенту просто отдаём код 500 с общим описание что-то пошло не так. А в логах фиксируем реальную ошибку."""
-    code = 500
+    code = HTTPStatus.INTERNAL_SERVER_ERROR
     name = "System error in database"
 
     def __init__(self, description: t.Optional[str] = None):
-        self.description = description or "Something went wrong. Please try again later"
+        self.description = description or const_messages.EXC_SOMETHING_WENT_WRONG
         super().__init__()
 
 
 class WrongCredentials(HTTPException):
     """EXC бросаем его если пользователь при аутентификации указал неверный логи или пароль"""
-    code = 401
+    code = HTTPStatus.UNAUTHORIZED
     name = "Wrong credentials"
 
     def __init__(self, description: str):
@@ -56,7 +59,7 @@ class WrongCredentials(HTTPException):
 
 class RefreshTokenInvalid(HTTPException):
     """EXC бросаем его если refresh token отсутствует в БД, то есть считаем его недействительным"""
-    code = 401
+    code = HTTPStatus.UNAUTHORIZED
     name = "Refresh token is unavailable"
 
     def __init__(self, description: str):
